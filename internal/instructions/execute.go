@@ -1,4 +1,5 @@
-// Copyright 2021 VMware, Inc.
+// Copyright 2022 Nukleros
+// Copyright 2021-2022 VMware, Inc.
 // SPDX-License-Identifier: MIT
 
 package instructions
@@ -7,8 +8,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/nukleros/yaml-overlay-tool/internal/overlays"
 	"github.com/op/go-logging"
-	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/overlays"
 	"golang.org/x/sync/errgroup"
 )
 

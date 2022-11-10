@@ -1,9 +1,10 @@
-// Copyright 2021 VMware, Inc.
+// Copyright 2022 Nukleros
+// Copyright 2021-2022 VMware, Inc.
 // SPDX-License-Identifier: MIT
 
 package instructions
 
-import "github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/overlays"
+import "github.com/nukleros/yaml-overlay-tool/internal/overlays"
 
 // Document is a set of overlays scoped to a specific document within a yamlfile.
 type Document struct {

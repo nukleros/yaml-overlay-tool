@@ -1,4 +1,5 @@
-// Copyright 2021 VMware, Inc.
+// Copyright 2022 Nukleros
+// Copyright 2021-2022 VMware, Inc.
 // SPDX-License-Identifier: MIT
 
 package instructions_test
@@ -6,8 +7,8 @@ package instructions_test
 import (
 	"testing"
 
+	"github.com/nukleros/yaml-overlay-tool/internal/instructions"
 	"github.com/spf13/viper"
-	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/instructions"
 )
 
 func TestExecute(t *testing.T) {

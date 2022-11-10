@@ -1,4 +1,4 @@
-module github.com/vmware-tanzu-labs/yaml-overlay-tool
+module github.com/nukleros/yaml-overlay-tool
 
 go 1.16
 

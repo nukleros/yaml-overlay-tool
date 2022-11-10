@@ -1,4 +1,5 @@
-// Copyright 2021 VMware, Inc.
+// Copyright 2022 Nukleros
+// Copyright 2021-2022 VMware, Inc.
 // SPDX-License-Identifier: MIT
 
 package builder
@@ -9,7 +10,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/actions"
+	"github.com/nukleros/yaml-overlay-tool/internal/actions"
 	"gopkg.in/yaml.v3"
 )
 

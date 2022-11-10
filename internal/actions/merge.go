@@ -1,4 +1,5 @@
-// Copyright 2021 VMware, Inc.
+// Copyright 2022 Nukleros
+// Copyright 2021-2022 VMware, Inc.
 // SPDX-License-Identifier: MIT
 
 package actions
@@ -213,3 +214,4 @@ func addNode(o *yaml.Node, nv ...*yaml.Node) error {
 
 	return nil
 }
+

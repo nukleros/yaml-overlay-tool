@@ -1,4 +1,5 @@
-// Copyright 2021 VMware, Inc.
+// Copyright 2022 Nukleros
+// Copyright 2021-2022 VMware, Inc.
 // SPDX-License-Identifier: MIT
 
 package commands_test
@@ -7,8 +8,8 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/nukleros/yaml-overlay-tool/internal/commands"
 	"github.com/spf13/cobra"
-	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/commands"
 )
 
 func TestNew(t *testing.T) { //nolint:paralleltest

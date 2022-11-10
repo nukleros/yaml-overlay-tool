@@ -1,4 +1,5 @@
-// Copyright 2021 VMware, Inc.
+// Copyright 2022 Nukleros
+// Copyright 2021-2022 VMware, Inc.
 // SPDX-License-Identifier: MIT
 
 package overlays
@@ -8,9 +9,9 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/nukleros/yaml-overlay-tool/internal/actions"
+	"github.com/nukleros/yaml-overlay-tool/internal/builder"
 	"github.com/spf13/viper"
-	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/actions"
-	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/builder"
 	"gopkg.in/yaml.v3"
 )
 

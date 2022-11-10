@@ -30,7 +30,7 @@ We'll cover more advanced features in future lessons, such as:
 
 In the meantime, if you have any further questions: 
   - Please join our [YAML Overlay Tool Users group on Google Groups](https://groups.google.com/g/yaml-overlay-tool-users)
-  - Or feel free to open issues on our [Github project](https://github.com/vmware-tanzu-labs/yaml-overlay-tool)
+  - Or feel free to open issues on our [Github project](https://github.com/nukleros/yaml-overlay-tool)
   - See the full project documentation at [https://docs.yaml-overlay-tool.io](https://docs.yaml-overlay-tool.io)
 
 

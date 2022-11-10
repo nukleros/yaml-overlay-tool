@@ -1,4 +1,5 @@
-// Copyright 2021 VMware, Inc.
+// Copyright 2022 Nukleros
+// Copyright 2021-2022 VMware, Inc.
 // SPDX-License-Identifier: MIT
 
 package overlays
@@ -113,3 +114,4 @@ func (mq *Queries) Set(val string) error {
 func (mq *Queries) Type() string {
 	return "overlays.Queries"
 }
+

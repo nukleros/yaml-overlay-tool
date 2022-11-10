@@ -1,4 +1,5 @@
-// Copyright 2021 VMware, Inc.
+// Copyright 2022 Nukleros
+// Copyright 2021-2022 VMware, Inc.
 // SPDX-License-Identifier: MIT
 
 package commands
@@ -8,11 +9,11 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/nukleros/yaml-overlay-tool/internal/actions"
+	"github.com/nukleros/yaml-overlay-tool/internal/instructions"
 	"github.com/op/go-logging"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/actions"
-	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/instructions"
 )
 
 // ErrMissingRequired occurs when a required flag is not passed.

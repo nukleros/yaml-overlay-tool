@@ -1,4 +1,5 @@
-// Copyright 2021 VMware, Inc.
+// Copyright 2022 Nukleros
+// Copyright 2021-2022 VMware, Inc.
 // SPDX-License-Identifier: MIT
 
 package commands
@@ -131,3 +132,4 @@ PowerShell:
 	envShort = "yot environment information"
 	envLong  = `Env prints out all the environment information in use by yot`
 )
+

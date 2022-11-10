@@ -1,4 +1,5 @@
-// Copyright 2021 VMware, Inc.
+// Copyright 2022 Nukleros
+// Copyright 2021-2022 VMware, Inc.
 // SPDX-License-Identifier: MIT
 
 package actions
@@ -142,3 +143,4 @@ func (a *OnMissingAction) Set(val string) error {
 func (a *OnMissingAction) Type() string {
 	return "actions.OnMissingAction"
 }
+

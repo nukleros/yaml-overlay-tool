@@ -1,7 +1,6 @@
-// Copyright 2021 VMware, Inc.
+// Copyright 2022 Nukleros
+// Copyright 2021-2022 VMware, Inc.
 // SPDX-License-Identifier: MIT
-
-// contains tests for the yaml-overlay-tool 'combine' action
 
 package actions_test
 
@@ -27,7 +26,7 @@ metadata:
   labels:
     app.kubernetes.io/name: external-dnses
   annotations:
-    # NOTE: this only works on 1.19.1+vmware.1+, but not prior
+    # NOTE: aws, but not prior
     ## This annotation will be ignored on other cloud providers
     service.beta.kubernetes.io/aws-load-balancer-type: nlb
 spec:
@@ -63,7 +62,7 @@ metadata:
   labels:
     app.kubernetes.io/name: external-dns
   annotations:
-    # NOTE: this only works on 1.19.1+vmware.1+, but not prior
+    # NOTE: aws, but not prior
     ## This annotation will be ignored on other cloud providers
     service.beta.kubernetes.io/aws-load-balancer-type: nlb
 spec:
@@ -99,7 +98,7 @@ metadata:
   labels:
     app.kubernetes.io/name: external-dns
   annotations:
-    # NOTE: this only works on 1.19.1+vmware.1+, but not prior
+    # NOTE: aws, but not prior
     ## This annotation will be ignored on other cloud providers
     service.beta.kubernetes.io/aws-load-balancer-type: nlb
 spec:
@@ -135,7 +134,7 @@ metadata:
   labels:
     app.kubernetes.io/name: external-dns
   annotations:
-    # NOTE: this only works on 1.19.1+vmware.1+, but not prior
+    # NOTE: aws, but not prior
     ## This annotation will be ignored on other cloud providers
     service.beta.kubernetes.io/aws-load-balancer-type: nlb
 spec:
@@ -171,7 +170,7 @@ metadata:
   labels:
     app.kubernetes.io/name: external-dns
   annotations:
-    # NOTE: this only works on 1.19.1+vmware.1+, but not prior
+    # NOTE: aws, but not prior
     ## This annotation will be ignored on other cloud providers
     service.beta.kubernetes.io/aws-load-balancer-type: nlb
 spec:
@@ -207,7 +206,7 @@ metadata:
   labels:
     app.kubernetes.io/name: external-dns
   annotations:
-    # NOTE: this only works on 1.19.1+vmware.1+, but not prior
+    # NOTE: aws, but not prior
     ## This annotation will be ignored on other cloud providers
     service.beta.kubernetes.io/aws-load-balancer-type: nlb
 spec:
@@ -243,7 +242,7 @@ metadata:
   labels:
     app.kubernetes.io/name: external-dns
   annotations:
-    # NOTE: this only works on 1.19.1+vmware.1+, but not prior
+    # NOTE: aws, but not prior
     ## This annotation will be ignored on other cloud providers
     service.beta.kubernetes.io/aws-load-balancer-type: nlbs #line
     # foot

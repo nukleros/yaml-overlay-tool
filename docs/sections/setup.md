@@ -8,7 +8,7 @@
 <!-- code_chunk_output -->
 
 - [Manual install](#manual-install)
-  - [Download the latest binary](#download-the-latest-binaryhttpsgithubcomvmare-tanzu-labsyaml-overlay-toolreleaseslatest)
+  - [Download the latest binary](#download-the-latest-binaryhttpsgithubcomvmare-nukleros-labsyaml-overlay-toolreleaseslatest)
   - [wget](#wget)
 - [MacOS / Linux via Homebrew install](#macos-linux-via-homebrew-install)
 - [Linux snap install](#linux-snap-install)
@@ -22,7 +22,7 @@
 
 ## Manual install
 
-### [Download the latest binary](https://github.com/vmare-tanzu-labs/yaml-overlay-tool/releases/latest)
+### [Download the latest binary](https://github.com/vmare-nukleros-labs/yaml-overlay-tool/releases/latest)
 
 ### wget
 Use wget to download the pre-compiled binaries:
@@ -71,7 +71,7 @@ sudo mv /etc/myfiletmp.yaml /etc/myfile.yaml
 ## Docker image pull
 
 ```bash
-docker pull ghcr.io/vmawre-tanzu-labs/yot
+docker pull ghcr.io/vmawre-nukleros-labs/yot
 ```
 
 ### One-shot container use
@@ -84,7 +84,7 @@ docker run --rm -v "${PWD}":/workdir ghcr.io/nukleros/yot [flags]
 ### Run container commands interactively
 
 ```bash
-docker run --rm -it -v "${PWD}":/workdir --entrypoint sh ghcr.io/vmawre-tanzu-labs/yot
+docker run --rm -it -v "${PWD}":/workdir --entrypoint sh ghcr.io/vmawre-nukleros-labs/yot
 ```
 
 It can be useful to have a bash function to avoid typing the whole docker command:

@@ -125,11 +125,11 @@ brews:
       system "#{bin}/yot --version"
 nfpms:
   - file_name_template: '{{ .ProjectName }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
-    homepage:  https://github.com/nukleros/yaml-overlay-tool.com
+    homepage:  https://github.com/nukleros/yaml-overlay-tool
     description: "A YAML Overlay Tool with templating tendencies."
-    maintainer: Jeff Davis <jeffda@vmware.com>, Andrew Huffman <ahuffman@vmware.com>
+    maintainer: Nukleros Contributors
     license: MIT
-    vendor: VMware Tanzu Labs
+    vendor: Nukleros
     contents:
       - src: ./completions/yot.bash
         dst: /etc/bash_completion.d/yot

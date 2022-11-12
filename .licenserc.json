@@ -1,10 +1,8 @@
 {
     "**/*.go": [
-        "// Copyright 2021-2022 VMware, Inc.",
-        "// SPDX-License-Identifier: MIT"
+        "// Copyright 2022 Nukleros"
     ],
     "yot": [
-        "# Copyright 2021 VMware, Inc.",
-        "# SPDX-License-Identifier: MIT"
+        "# Copyright 2022 Nukleros"
     ]
 }

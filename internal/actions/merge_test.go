@@ -22,7 +22,7 @@ func TestMergeNode(t *testing.T) {
 kind: Service
 metadata:
   name: bind-udp
-  namespace: tanzu-dns
+  namespace: nukleros-dns
   labels:
     app.kubernetes.io/name: external-dns
   annotations:
@@ -62,7 +62,7 @@ spec:
 kind: Service
 metadata:
   name: bind-udp
-  namespace: tanzu-dns
+  namespace: nukleros-dns
   labels:
     app.kubernetes.io/name: external-dns
     foo: bar
@@ -101,7 +101,7 @@ spec:
 kind: Service
 metadata:
   name: bind-udp
-  namespace: tanzu-dns
+  namespace: nukleros-dns
   labels:
     app.kubernetes.io/name: external-dns
     foo: bar
@@ -140,7 +140,7 @@ spec:
 kind: Service
 metadata:
   name: bind-udp
-  namespace: tanzu-dns
+  namespace: nukleros-dns
   labels:
     app.kubernetes.io/name: external-dns # test
   annotations:
@@ -176,7 +176,7 @@ spec:
 kind: MyService
 metadata:
   name: bind-udp
-  namespace: tanzu-dns
+  namespace: nukleros-dns
   labels:
     app.kubernetes.io/name: external-dns
   annotations:
@@ -212,7 +212,7 @@ spec:
 kind: Service
 metadata:
   name: bind-udp
-  namespace: tanzu-dns
+  namespace: nukleros-dns
   labels:
     app.kubernetes.io/name: external-dns
   annotations:
@@ -250,7 +250,7 @@ spec:
 kind: Service
 metadata:
   name: bind-udp
-  namespace: tanzu-dns
+  namespace: nukleros-dns
   labels:
     app.kubernetes.io/name: external-dns
   annotations:

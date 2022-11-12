@@ -22,7 +22,7 @@ func TestReplaceNode(t *testing.T) {
 kind: Service
 metadata:
   name: bind-udp
-  namespace: tanzu-dns
+  namespace: nukleros-dns
   labels:
     app.kubernetes.io/name: rpk-dns
   annotations:
@@ -58,7 +58,7 @@ spec:
 kind: Service
 metadata:
   name: bind-udp
-  namespace: tanzu-dns
+  namespace: nukleros-dns
   labels:
     app.kubernetes.io/name: external-dns
   annotations:
@@ -102,7 +102,7 @@ spec:
 kind: Service
 metadata:
   name: bind-udp
-  namespace: tanzu-dns
+  namespace: nukleros-dns
   labels:
     app.kubernetes.io/name: external-dns
   annotations:

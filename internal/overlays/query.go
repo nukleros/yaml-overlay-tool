@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/vmware-labs/yaml-jsonpath/pkg/yamlpath"
+	"github.com/nukleros/yaml-jsonpath/pkg/yamlpath"
 	"gopkg.in/yaml.v3"
 )
 
@@ -114,4 +114,3 @@ func (mq *Queries) Set(val string) error {
 func (mq *Queries) Type() string {
 	return "overlays.Queries"
 }
-

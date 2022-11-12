@@ -7,7 +7,7 @@ package overlays
 import (
 	"testing"
 
-	"github.com/vmware-labs/yaml-jsonpath/pkg/yamlpath"
+	"github.com/nukleros/yaml-jsonpath/pkg/yamlpath"
 	"gopkg.in/yaml.v3"
 )
 
@@ -17,7 +17,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: bind-udp
-  namespace: tanzu-dns
+  namespace: nukleros-dns
   labels:
     app.kubernetes.io/name: external-dns
   annotations:

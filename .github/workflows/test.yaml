@@ -1,6 +1,6 @@
 ---
 name: Lint
-'on':
+on:
   - push
   - pull_request
 jobs:
@@ -12,7 +12,7 @@ jobs:
       - name: golangci-lint
         uses: golangci/golangci-lint-action@v2
         with:
-          version: 1.50.1
+          version: v1.50.1
 
   yaml-lint:
     name: Yaml Lint

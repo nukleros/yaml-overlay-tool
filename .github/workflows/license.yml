@@ -1,6 +1,6 @@
 ---
 name: Check License Lines
-'on':
+on:
   - push
   - pull_request
 jobs:

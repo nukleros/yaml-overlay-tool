@@ -2,3 +2,4 @@ yot.log
 output/
 yotdist/
 yot
+*.out

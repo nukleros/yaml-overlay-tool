@@ -214,4 +214,3 @@ func addNode(o *yaml.Node, nv ...*yaml.Node) error {
 
 	return nil
 }
-

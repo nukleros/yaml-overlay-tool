@@ -7,8 +7,9 @@ package instructions
 import (
 	"fmt"
 
-	"github.com/nukleros/yaml-overlay-tool/internal/actions"
 	"gopkg.in/yaml.v3"
+
+	"github.com/nukleros/yaml-overlay-tool/internal/actions"
 )
 
 func getValues(fileNames []string) (interface{}, error) {

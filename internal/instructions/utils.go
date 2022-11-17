@@ -107,4 +107,3 @@ func getFileNames(p string) ([]string, error) {
 
 	return results, nil
 }
-

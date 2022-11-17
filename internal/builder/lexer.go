@@ -461,4 +461,3 @@ func (l *lexer) handleBracket() stateFn {
 
 	return lexSubPath
 }
-

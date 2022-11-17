@@ -5,10 +5,11 @@
 package commands
 
 import (
-	"github.com/nukleros/yaml-overlay-tool/internal/actions"
 	"github.com/op/go-logging"
 	"github.com/spf13/viper"
 	"github.com/thediveo/enumflag"
+
+	"github.com/nukleros/yaml-overlay-tool/internal/actions"
 )
 
 func (r *Root) initializeCommonFlags() {

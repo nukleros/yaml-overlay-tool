@@ -111,4 +111,3 @@ func GetStyleFromConfig(v ...string) Styles {
 
 	return result
 }
-

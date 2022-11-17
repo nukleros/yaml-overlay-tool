@@ -7,9 +7,10 @@ package overlays
 import (
 	"fmt"
 
-	"github.com/nukleros/yaml-overlay-tool/internal/actions"
 	"github.com/op/go-logging"
 	"gopkg.in/yaml.v3"
+
+	"github.com/nukleros/yaml-overlay-tool/internal/actions"
 )
 
 var log = logging.MustGetLogger("overlays") //nolint:gochecknoglobals

@@ -9,10 +9,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/nukleros/yaml-overlay-tool/internal/actions"
-	"github.com/nukleros/yaml-overlay-tool/internal/builder"
 	"github.com/spf13/viper"
 	"gopkg.in/yaml.v3"
+
+	"github.com/nukleros/yaml-overlay-tool/internal/actions"
+	"github.com/nukleros/yaml-overlay-tool/internal/builder"
 )
 
 var (

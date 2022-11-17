@@ -7,8 +7,9 @@ package instructions_test
 import (
 	"testing"
 
-	"github.com/nukleros/yaml-overlay-tool/internal/instructions"
 	"github.com/spf13/viper"
+
+	"github.com/nukleros/yaml-overlay-tool/internal/instructions"
 )
 
 func TestExecute(t *testing.T) {

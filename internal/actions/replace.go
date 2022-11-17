@@ -25,4 +25,3 @@ func ReplaceNode(original, replace *yaml.Node) error {
 
 	return nil
 }
-

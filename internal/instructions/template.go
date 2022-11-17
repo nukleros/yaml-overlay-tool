@@ -29,4 +29,3 @@ func renderInstructionsTemplate(fileName string, values interface{}) (io.Reader,
 
 	return &b, nil
 }
-

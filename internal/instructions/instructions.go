@@ -12,9 +12,10 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/nukleros/yaml-overlay-tool/internal/overlays"
 	"github.com/spf13/viper"
 	"gopkg.in/yaml.v3"
+
+	"github.com/nukleros/yaml-overlay-tool/internal/overlays"
 )
 
 // Instructions is a struct used for decoding an instructions file.

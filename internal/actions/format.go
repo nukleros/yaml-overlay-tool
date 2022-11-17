@@ -47,6 +47,7 @@ func sanitizeValues(v ...interface{}) []interface{} {
 		KeyMarker,
 	} {
 		for j := range v {
+			//nolint:forcetypeassert
 			v[j] = strings.ReplaceAll(v[j].(string), t, "")
 		}
 	}
@@ -119,4 +120,3 @@ func processSedCommand(command, value string) (string, error) {
 
 	return value, nil
 }
-

@@ -132,4 +132,3 @@ PowerShell:
 	envShort = "yot environment information"
 	envLong  = `Env prints out all the environment information in use by yot`
 )
-

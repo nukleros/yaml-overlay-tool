@@ -8,9 +8,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/nukleros/yaml-overlay-tool/internal/overlays"
 	"github.com/op/go-logging"
 	"golang.org/x/sync/errgroup"
+
+	"github.com/nukleros/yaml-overlay-tool/internal/overlays"
 )
 
 var log = logging.MustGetLogger("instructions") //nolint:gochecknoglobals

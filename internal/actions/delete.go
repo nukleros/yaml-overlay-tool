@@ -55,4 +55,3 @@ func DeleteNode(pn, child *yaml.Node) {
 		return
 	}
 }
-

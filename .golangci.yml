@@ -6,7 +6,7 @@ linters-settings:
     lines: 100
     statements: 50
   gci:
-    local-prefixes: github.com/golangci/golangci-lint
+    local-prefixes: github.com/nukleros/yaml-overlay-tool
   goconst:
     min-len: 2
     min-occurrences: 2
@@ -26,7 +26,7 @@ linters-settings:
   gocyclo:
     min-complexity: 15
   goimports:
-    local-prefixes: github.com/golangci/golangci-lint
+    local-prefixes: github.com/nukleros/yaml-overlay-tool
   golint:
     min-confidence: 0
   gomnd:
@@ -68,7 +68,6 @@ linters:
     - asciicheck
     - bodyclose
     - cyclop
-    - deadcode
     - depguard
     - dogsled
     - dupl
@@ -76,10 +75,8 @@ linters:
     - errcheck
     - errorlint
     - exhaustive
-    # - exhaustivestruct
     - exportloopref
     - forbidigo
-    #- forcetypeassert
     - funlen
     - gci
     - gochecknoglobals
@@ -94,7 +91,6 @@ linters:
     - gofmt
     - goheader
     - goimports
-    - golint
     - gomnd
     - gomoddirectives
     - gomodguard
@@ -102,10 +98,8 @@ linters:
     - gosec
     - gosimple
     - govet
-    - ifshort
     - importas
     - ineffassign
-    - interfacer
     - lll
     - makezero
     - misspell
@@ -118,11 +112,8 @@ linters:
     - paralleltest
     - prealloc
     - predeclared
-    # - revive
-    - rowserrcheck
-    - sqlclosecheck
+    - revive
     - staticcheck
-    - structcheck
     - stylecheck
     - testpackage
     - thelper
@@ -131,11 +122,27 @@ linters:
     - unconvert
     - unparam
     - unused
-    - varcheck
-    - wastedassign
     - whitespace
     - wrapcheck
     - wsl
+
+    # DEPRECATED: the following are deprecated and unused as of the version used in CI
+    # - interfacer
+    # - ifshort
+
+    # DISABLED: the following are disabled by the linter itself and therefore unused
+    # - rowserrcheck
+    # - sqlclosecheck
+    # - wastedassign
+
+    # ISSUES: the following are disabled with issues
+    # - exhaustruct:     too restrictive on how to define structures
+
+    # REPLACED: the following are replaced
+    # - deadcode    - replaced by unused
+    # - golint      - replaced by revive
+    # - structcheck - repaced by unused
+    # - varcheck    - replaced by unused
 
 issues:
   # Excluding configuration per-path, per-linter, per-text and per-source

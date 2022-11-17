@@ -7,8 +7,9 @@ package actions_test
 import (
 	"testing"
 
-	"github.com/nukleros/yaml-overlay-tool/internal/actions"
 	"gopkg.in/yaml.v3"
+
+	"github.com/nukleros/yaml-overlay-tool/internal/actions"
 )
 
 func TestAction_String(t *testing.T) {

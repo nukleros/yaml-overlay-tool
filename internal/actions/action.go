@@ -143,4 +143,3 @@ func (a *OnMissingAction) Set(val string) error {
 func (a *OnMissingAction) Type() string {
 	return "actions.OnMissingAction"
 }
-

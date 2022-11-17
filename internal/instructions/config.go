@@ -11,11 +11,12 @@ import (
 	"os"
 	"path"
 
-	"github.com/nukleros/yaml-overlay-tool/internal/actions"
-	"github.com/nukleros/yaml-overlay-tool/internal/overlays"
 	"github.com/op/go-logging"
 	"github.com/spf13/viper"
 	"gopkg.in/yaml.v3"
+
+	"github.com/nukleros/yaml-overlay-tool/internal/actions"
+	"github.com/nukleros/yaml-overlay-tool/internal/overlays"
 )
 
 // Config contains configuration options used with instruction files.

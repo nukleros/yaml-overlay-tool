@@ -8,8 +8,9 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/nukleros/yaml-overlay-tool/internal/commands"
 	"github.com/spf13/cobra"
+
+	"github.com/nukleros/yaml-overlay-tool/internal/commands"
 )
 
 func TestNew(t *testing.T) { //nolint:paralleltest

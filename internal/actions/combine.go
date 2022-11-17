@@ -58,4 +58,3 @@ func CombineNode(originalValue, newValue *yaml.Node) error {
 
 	return nil
 }
-

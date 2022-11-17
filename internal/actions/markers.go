@@ -36,4 +36,3 @@ func checkForMarkers(s string) bool {
 
 	return false
 }
-

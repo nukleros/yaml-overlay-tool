@@ -9,11 +9,12 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/nukleros/yaml-overlay-tool/internal/actions"
-	"github.com/nukleros/yaml-overlay-tool/internal/instructions"
 	"github.com/op/go-logging"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+
+	"github.com/nukleros/yaml-overlay-tool/internal/actions"
+	"github.com/nukleros/yaml-overlay-tool/internal/instructions"
 )
 
 // ErrMissingRequired occurs when a required flag is not passed.

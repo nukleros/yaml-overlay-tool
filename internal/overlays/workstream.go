@@ -53,4 +53,3 @@ func (s *WorkStream) StartHandler() error {
 
 	return nil
 }
-

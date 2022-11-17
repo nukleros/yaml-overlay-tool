@@ -46,4 +46,3 @@ func (r *Root) Completions(cmd *cobra.Command, args []string) {
 		}
 	}
 }
-

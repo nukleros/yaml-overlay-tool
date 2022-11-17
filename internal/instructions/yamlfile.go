@@ -11,9 +11,10 @@ import (
 	"os"
 	"path"
 
-	"github.com/nukleros/yaml-overlay-tool/internal/overlays"
 	"github.com/spf13/viper"
 	"gopkg.in/yaml.v3"
+
+	"github.com/nukleros/yaml-overlay-tool/internal/overlays"
 )
 
 var ErrFoundDirectoryWithPathOutput = errors.New("found directory as input path with file as output path")

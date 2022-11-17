@@ -65,4 +65,3 @@ func (dq *DocumentQuery) checkQuery(node *yaml.Node) bool {
 
 	return true
 }
-

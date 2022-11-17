@@ -61,4 +61,3 @@ func envMap() map[string]string {
 		"YOT_STDOUT":                    "stdout",
 	}
 }
-

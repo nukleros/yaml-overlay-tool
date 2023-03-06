@@ -1,5 +1,7 @@
 [Back to Project](https://github.com/nukleros/yaml-overlay-tool)
 
+![yaml-overlay-tool logo](src/logo/yot-logo.png)
+
 
 # Introduction to YAML Overlay Tool
 

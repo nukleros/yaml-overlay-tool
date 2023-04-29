@@ -81,7 +81,7 @@ func isDirectory(p string) (bool, error) {
 	return fileInfo.IsDir(), err
 }
 
-// getFileNames recursively walks a path and outputs all filenames found.
+// getFileNames recursively walks a path and outputs all '.yaml' and '.yml' filenames found.
 func getFileNames(p string) ([]string, error) {
 	var results []string
 

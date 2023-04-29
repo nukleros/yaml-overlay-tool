@@ -37,12 +37,12 @@ func (cfg *Config) GetInstructions() (*Instructions, error) {
 			return nil, err
 		}
 	} else {
-		wd, err := os.Getwd()
+		workingDirectory, err := os.Getwd()
 		if err != nil {
 			return nil, fmt.Errorf("could not determine working directory, %w", err)
 		}
 
-		viper.Set("instructionDir", wd)
+		viper.Set("instructionDir", workingDirectory)
 	}
 
 	if err := cfg.ReadAdHocPaths(instructions); err != nil {
@@ -103,8 +103,8 @@ func (cfg *Config) ReadInstructionFile() (*Instructions, error) {
 		}
 	}
 
-	dc := yaml.NewDecoder(reader)
-	if err := dc.Decode(&instructions); err != nil {
+	yamlDecoder := yaml.NewDecoder(reader)
+	if err := yamlDecoder.Decode(&instructions); err != nil {
 		return nil, fmt.Errorf("unable to read instructions file %s: %w", cfg.InstructionsFile, err)
 	}
 
@@ -112,28 +112,28 @@ func (cfg *Config) ReadInstructionFile() (*Instructions, error) {
 }
 
 // addCommonOverlays, takes all common overlays and adds them to each yamlFile entry.
-func (i *Instructions) addCommonOverlays() {
-	for _, yf := range i.YamlFiles {
-		yf.Overlays = append(i.CommonOverlays, yf.Overlays...)
+func (instructions *Instructions) addCommonOverlays() {
+	for _, yamlFile := range instructions.YamlFiles {
+		yamlFile.Overlays = append(instructions.CommonOverlays, yamlFile.Overlays...)
 	}
 }
 
-func (i *Instructions) setOutputPath() {
-	p := make([]string, 0, len(i.YamlFiles))
+func (instructions *Instructions) setOutputPath() {
+	outputPath := make([]string, 0, len(instructions.YamlFiles))
 
-	for _, yf := range i.YamlFiles {
-		if yf.Path != "-" {
-			p = append(p, yf.Path)
+	for _, yamlFile := range instructions.YamlFiles {
+		if yamlFile.Path != "-" {
+			outputPath = append(outputPath, yamlFile.Path)
 		}
 	}
 
-	pathPrefix := GetCommonPrefix(os.PathSeparator, p...)
+	pathPrefix := GetCommonPrefix(os.PathSeparator, outputPath...)
 
-	for _, yf := range i.YamlFiles {
-		if yf.OutputPath == "" {
-			yf.OutputPath = strings.TrimPrefix(yf.Path, pathPrefix)
-		} else if path.Ext(yf.OutputPath) == "" {
-			yf.OutputPath = path.Join(yf.OutputPath, path.Base(yf.Path))
+	for _, yamlFile := range instructions.YamlFiles {
+		if yamlFile.OutputPath == "" {
+			yamlFile.OutputPath = strings.TrimPrefix(yamlFile.Path, pathPrefix)
+		} else if path.Ext(yamlFile.OutputPath) == "" {
+			yamlFile.OutputPath = path.Join(yamlFile.OutputPath, path.Base(yamlFile.Path))
 		}
 	}
 }

@@ -38,18 +38,18 @@ type YamlFile struct {
 type YamlFiles []*YamlFile
 
 // queueOverlays sends all overlay jobs to the workstream for processing.
-func (yf *YamlFile) queueOverlays(stream *overlays.WorkStream) {
-	for nodeIndex, n := range yf.Nodes {
-		for _, o := range yf.Overlays {
-			if ok := o.CheckDocumentIndex(nodeIndex); ok {
-				stream.AddWorkload(o, n, nodeIndex, yf.Path)
+func (yamlFile *YamlFile) queueOverlays(stream *overlays.WorkStream) {
+	for nodeIndex, yamlNode := range yamlFile.Nodes {
+		for _, overlay := range yamlFile.Overlays {
+			if ok := overlay.CheckDocumentIndex(nodeIndex); ok {
+				stream.AddWorkload(overlay, yamlNode, nodeIndex, yamlFile.Path)
 			}
 		}
 
-		for _, d := range yf.Documents {
-			if ok := d.checkDocumentIndex(nodeIndex); ok {
-				for _, o := range d.Overlays {
-					stream.AddWorkload(o, n, nodeIndex, yf.Path)
+		for _, yamlDocument := range yamlFile.Documents {
+			if ok := yamlDocument.checkDocumentIndex(nodeIndex); ok {
+				for _, overlay := range yamlDocument.Overlays {
+					stream.AddWorkload(overlay, yamlNode, nodeIndex, yamlFile.Path)
 				}
 			}
 		}
@@ -58,135 +58,135 @@ func (yf *YamlFile) queueOverlays(stream *overlays.WorkStream) {
 	stream.CloseStream()
 }
 
-func (yfs *YamlFiles) UnmarshalYAML(value *yaml.Node) error {
-	var yft []*YamlFile
+func (yamlFiles *YamlFiles) UnmarshalYAML(yamlNode *yaml.Node) error {
+	var yamlFilesStruct []*YamlFile
 
-	if err := value.Decode(&yft); err != nil {
-		return fmt.Errorf("%w at line %d column %d", err, value.Line, value.Column)
+	if err := yamlNode.Decode(&yamlFilesStruct); err != nil {
+		return fmt.Errorf("%w at line %d column %d", err, yamlNode.Line, yamlNode.Column)
 	}
 
-	y := YamlFiles(yft)
-	if err := y.expandDirectories(); err != nil {
-		return fmt.Errorf("%w at line %d column %d", err, value.Line, value.Column)
+	parsedYamlFiles := YamlFiles(yamlFilesStruct)
+	if err := parsedYamlFiles.expandDirectories(); err != nil {
+		return fmt.Errorf("%w at line %d column %d", err, yamlNode.Line, yamlNode.Column)
 	}
 
-	y.mergeDuplicates()
+	parsedYamlFiles.mergeDuplicates()
 
-	for _, yf := range y {
-		if err := yf.readYamlFile(); err != nil {
+	for _, yamlFile := range parsedYamlFiles {
+		if err := yamlFile.readYamlFile(); err != nil {
 			return err
 		}
 	}
 
-	*yfs = y
+	*yamlFiles = parsedYamlFiles
 
 	return nil
 }
 
-func (yf *YamlFile) readYamlFile() error {
-	reader, err := ReadStream(yf.Path)
+func (yamlFile *YamlFile) readYamlFile() error {
+	reader, err := ReadStream(yamlFile.Path)
 	if err != nil {
 		return err
 	}
 
-	dc := yaml.NewDecoder(reader)
+	yamlDecoder := yaml.NewDecoder(reader)
 
 	for {
-		var y yaml.Node
+		var yamlNode yaml.Node
 
-		if err := dc.Decode(&y); errors.Is(err, io.EOF) {
+		if err := yamlDecoder.Decode(&yamlNode); errors.Is(err, io.EOF) {
 			if reader, ok := reader.(*os.File); ok {
 				CloseFile(reader)
 			}
 
 			break
 		} else if err != nil {
-			return fmt.Errorf("failed to read file %s: %w", yf.Path, err)
+			return fmt.Errorf("failed to read file %s: %w", yamlFile.Path, err)
 		}
 
-		yf.Nodes = append(yf.Nodes, &y)
+		yamlFile.Nodes = append(yamlFile.Nodes, &yamlNode)
 	}
 
 	return nil
 }
 
-func (yfs *YamlFiles) expandDirectories() error {
-	y := []*YamlFile(*yfs)
+func (yamlFiles *YamlFiles) expandDirectories() error {
+	updatedYamlFiles := []*YamlFile(*yamlFiles)
 
-	var paths []string
+	var yamlFilesInDir []string
 
-	for i := 0; i <= len(y)-1; i++ {
-		if y[i].Path == "-" {
+	for i := 0; i <= len(updatedYamlFiles)-1; i++ {
+		if updatedYamlFiles[i].Path == "-" {
 			continue
 		}
 
-		if !path.IsAbs(y[i].Path) {
-			y[i].Path = path.Join(viper.GetString("instructionsDir"), y[i].Path)
+		if !path.IsAbs(updatedYamlFiles[i].Path) {
+			updatedYamlFiles[i].Path = path.Join(viper.GetString("instructionsDir"), updatedYamlFiles[i].Path)
 		}
 
-		if ok, err := isDirectory(y[i].Path); err != nil {
+		if ok, err := isDirectory(updatedYamlFiles[i].Path); err != nil {
 			return err
 		} else if ok {
-			if path.Ext(y[i].OutputPath) != "" {
+			if path.Ext(updatedYamlFiles[i].OutputPath) != "" {
 				return fmt.Errorf("%w, provide a directory for outputPath instead", ErrFoundDirectoryWithPathOutput)
 			}
-			paths, err = getFileNames(y[i].Path)
+			yamlFilesInDir, err = getFileNames(updatedYamlFiles[i].Path)
 			if err != nil {
 				return err
 			}
 
-			for _, p := range paths {
-				sp := &YamlFile{
-					Name:       y[i].Name,
-					Overlays:   y[i].Overlays,
-					Documents:  y[i].Documents,
-					Path:       p,
-					OutputPath: y[i].OutputPath,
+			for _, foundYamlFilePath := range yamlFilesInDir {
+				addSpecificYamlPath := &YamlFile{
+					Name:       updatedYamlFiles[i].Name,
+					Overlays:   updatedYamlFiles[i].Overlays,
+					Documents:  updatedYamlFiles[i].Documents,
+					Path:       foundYamlFilePath,
+					OutputPath: updatedYamlFiles[i].OutputPath,
 				}
 
-				y = append(y, sp)
+				updatedYamlFiles = append(updatedYamlFiles, addSpecificYamlPath)
 			}
 
-			y = append(y[:i], y[i+1:]...)
+			updatedYamlFiles = append(updatedYamlFiles[:i], updatedYamlFiles[i+1:]...)
 			i--
 		}
 	}
 
-	*yfs = y
+	*yamlFiles = updatedYamlFiles
 
 	return nil
 }
 
-func (yfs *YamlFiles) mergeDuplicates() {
-	ys := []*YamlFile(*yfs)
+func (yamlFiles *YamlFiles) mergeDuplicates() {
+	updatedYamlFiles := []*YamlFile(*yamlFiles)
 
-	search := make(map[string]*YamlFile, len(*yfs))
+	search := make(map[string]*YamlFile, len(*yamlFiles))
 
-	for i := 0; i <= len(ys)-1; i++ {
-		if search[ys[i].Path] == nil {
-			search[ys[i].Path] = ys[i]
+	for i := 0; i <= len(updatedYamlFiles)-1; i++ {
+		if search[updatedYamlFiles[i].Path] == nil {
+			search[updatedYamlFiles[i].Path] = updatedYamlFiles[i]
 		} else {
-			search[ys[i].Path].Overlays = append(search[ys[i].Path].Overlays, ys[i].Overlays...)
-			search[ys[i].Path].Documents = append(search[ys[i].Path].Documents, ys[i].Documents...)
-			if ys[i].OutputPath != "" {
-				search[ys[i].Path].OutputPath = ys[i].OutputPath
+			search[updatedYamlFiles[i].Path].Overlays = append(search[updatedYamlFiles[i].Path].Overlays, updatedYamlFiles[i].Overlays...)
+			search[updatedYamlFiles[i].Path].Documents = append(search[updatedYamlFiles[i].Path].Documents, updatedYamlFiles[i].Documents...)
+			if updatedYamlFiles[i].OutputPath != "" {
+				search[updatedYamlFiles[i].Path].OutputPath = updatedYamlFiles[i].OutputPath
 			}
 
-			ys = append(ys[:i], ys[i+1:]...)
+			updatedYamlFiles = append(updatedYamlFiles[:i], updatedYamlFiles[i+1:]...)
 			i--
 		}
 	}
 
-	*yfs = ys
+	*yamlFiles = updatedYamlFiles
 }
 
 // removeCommentsFromNode will traverse the tree of yaml nodes and remove all comments.
-func removeCommentsFromNode(node *yaml.Node) {
-	if node.Content == nil {
+func removeCommentsFromNode(yamlNode *yaml.Node) {
+	if yamlNode.Content == nil {
 		return
 	}
 
-	for _, child := range node.Content {
+	for _, child := range yamlNode.Content {
 		child.HeadComment = ""
 		child.LineComment = ""
 		child.FootComment = ""

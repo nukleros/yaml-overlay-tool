@@ -13,6 +13,7 @@ import (
 	"path/filepath"
 )
 
+// ReadStream reads a yaml file from stdin.
 func ReadStream(fileName string) (io.Reader, error) {
 	if fileName == "-" {
 		return bufio.NewReader(os.Stdin), nil
@@ -34,7 +35,7 @@ func CloseFile(file *os.File) {
 }
 
 // GetCommonPrefix determines the longest common prefix in a set of paths.
-func GetCommonPrefix(sep byte, paths ...string) string {
+func GetCommonPrefix(separator byte, paths ...string) string {
 	switch len(paths) {
 	case 0:
 		return ""
@@ -42,50 +43,50 @@ func GetCommonPrefix(sep byte, paths ...string) string {
 		return path.Dir(path.Clean(paths[0])) + string(os.PathSeparator)
 	}
 
-	c := path.Clean(paths[0]) + string(sep)
+	cleanPath := path.Clean(paths[0]) + string(separator)
 
 	for _, v := range paths[1:] {
-		v = path.Clean(v) + string(sep)
+		v = path.Clean(v) + string(separator)
 
-		if len(v) < len(c) {
-			c = c[:len(v)]
+		if len(v) < len(cleanPath) {
+			cleanPath = cleanPath[:len(v)]
 		}
 
-		for i := 0; i < len(c); i++ {
-			if v[i] != c[i] {
-				c = c[:i]
+		for i := 0; i < len(cleanPath); i++ {
+			if v[i] != cleanPath[i] {
+				cleanPath = cleanPath[:i]
 
 				break
 			}
 		}
 	}
 
-	for i := len(c) - 1; i >= 0; i-- {
-		if c[i] == sep {
-			c = c[:i]
+	for i := len(cleanPath) - 1; i >= 0; i-- {
+		if cleanPath[i] == separator {
+			cleanPath = cleanPath[:i]
 
 			break
 		}
 	}
 
-	return c + string(os.PathSeparator)
+	return cleanPath + string(os.PathSeparator)
 }
 
 // isDirectory determines if the given path is a directory.
-func isDirectory(p string) (bool, error) {
-	fileInfo, err := os.Stat(p)
+func isDirectory(filePath string) (bool, error) {
+	fileInfo, err := os.Stat(filePath)
 	if err != nil {
-		return false, fmt.Errorf("could not get file info for %s, %w", p, err)
+		return false, fmt.Errorf("could not get file info for %s, %w", filePath, err)
 	}
 
 	return fileInfo.IsDir(), err
 }
 
 // getFileNames recursively walks a path and outputs all '.yaml' and '.yml' filenames found.
-func getFileNames(p string) ([]string, error) {
+func getFileNames(filePath string) ([]string, error) {
 	var results []string
 
-	err := filepath.Walk(p,
+	err := filepath.Walk(filePath,
 		func(path string, info os.FileInfo, err error) error {
 			if err != nil {
 				return err
@@ -102,7 +103,7 @@ func getFileNames(p string) ([]string, error) {
 			return nil
 		})
 	if err != nil {
-		return nil, fmt.Errorf("could not walk directory %s, %w", p, err)
+		return nil, fmt.Errorf("could not walk directory %s, %w", filePath, err)
 	}
 
 	return results, nil

@@ -14,18 +14,18 @@ import (
 )
 
 func renderInstructionsTemplate(fileName string, values interface{}) (io.Reader, error) {
-	tpl, err := template.ParseFiles(fileName)
+	instrTemplate, err := template.ParseFiles(fileName)
 	if err != nil {
 		return nil, fmt.Errorf("unable to process template for instructions file %s, %w", fileName, err)
 	}
 
-	tpl = tpl.Funcs(template.FuncMap(sprig.FuncMap())).Option("missingkey=zero")
+	instrTemplate = instrTemplate.Funcs(template.FuncMap(sprig.FuncMap())).Option("missingkey=zero")
 
-	var b bytes.Buffer
+	var byteBuffer bytes.Buffer
 
-	if err := tpl.Execute(&b, values); err != nil {
+	if err := instrTemplate.Execute(&byteBuffer, values); err != nil {
 		return nil, fmt.Errorf("%w", err)
 	}
 
-	return &b, nil
+	return &byteBuffer, nil
 }

@@ -25,29 +25,29 @@ func NewWorkStream() *WorkStream {
 	return &WorkStream{}
 }
 
-func (s *WorkStream) StartStream() {
-	s.stream = make(chan *workload)
+func (workStream *WorkStream) StartStream() {
+	workStream.stream = make(chan *workload)
 }
 
-func (s *WorkStream) AddWorkload(o *Overlay, n *yaml.Node, nodeIndex int, path string) {
-	s.stream <- &workload{
-		Overlay:   o,
-		Node:      n,
+func (workStream *WorkStream) AddWorkload(overlay *Overlay, yamlNode *yaml.Node, nodeIndex int, path string) {
+	workStream.stream <- &workload{
+		Overlay:   overlay,
+		Node:      yamlNode,
 		NodeIndex: nodeIndex,
 		Path:      path,
 	}
 }
 
-func (s *WorkStream) CloseStream() {
-	close(s.stream)
+func (workStream *WorkStream) CloseStream() {
+	close(workStream.stream)
 }
 
-func (s *WorkStream) StartHandler() error {
-	for o := range s.stream {
-		log.Noticef("Processing overlay [%q] in file %s on document %d", o.Overlay.Name, o.Path, o.NodeIndex)
+func (workStream *WorkStream) StartHandler() error {
+	for overlay := range workStream.stream {
+		log.Noticef("Processing overlay [%q] in file %s on document %d", overlay.Overlay.Name, overlay.Path, overlay.NodeIndex)
 
-		if err := o.Overlay.Apply(o.Node); err != nil {
-			return fmt.Errorf("%w in file %s on Document %d", err, o.Path, o.NodeIndex)
+		if err := overlay.Overlay.Apply(overlay.Node); err != nil {
+			return fmt.Errorf("%w in file %s on Document %d", err, overlay.Path, overlay.NodeIndex)
 		}
 	}
 

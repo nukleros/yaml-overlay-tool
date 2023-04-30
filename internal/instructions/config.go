@@ -36,35 +36,35 @@ type Config struct {
 }
 
 // doPostProcessing renders a document and outputs it to the location specified in config.
-func (cfg *Config) doPostProcessing(yf *YamlFile) error {
-	var o *os.File
+func (cfg *Config) doPostProcessing(yamlFile *YamlFile) error {
+	var outputPath *os.File
 
 	var err error
 
-	output, err := cfg.encodeNodes(yf.Nodes)
+	output, err := cfg.encodeNodes(yamlFile.Nodes)
 	if err != nil {
-		return fmt.Errorf("unable to marshal final document %s, error: %w", yf.Path, err)
+		return fmt.Errorf("unable to marshal final document %s, error: %w", yamlFile.Path, err)
 	}
 
 	if output.Len() == 0 {
-		log.Debugf("File %s was omitted from output", yf.Path)
+		log.Debugf("File %s was omitted from output", yamlFile.Path)
 
 		return nil
 	}
 
 	if viper.GetBool("stdout") {
-		o = os.Stdout
+		outputPath = os.Stdout
 	} else {
 		log.Debugf("Final: >>>\n%s\n", output)
-		o, err = cfg.openOutputFile(yf)
+		outputPath, err = cfg.openOutputFile(yamlFile)
 		if err != nil {
 			return err
 		}
 
-		defer CloseFile(o)
+		defer CloseFile(outputPath)
 	}
 
-	if _, err = output.WriteTo(o); err != nil {
+	if _, err = output.WriteTo(outputPath); err != nil {
 		return fmt.Errorf("failed to %w", err)
 	}
 
@@ -74,13 +74,13 @@ func (cfg *Config) doPostProcessing(yf *YamlFile) error {
 }
 
 // openOutputFile opens or creates a file for outputing results.
-func (cfg *Config) openOutputFile(yf *YamlFile) (*os.File, error) {
+func (cfg *Config) openOutputFile(yamlFile *YamlFile) (*os.File, error) {
 	defaultDirMode := 0755
 	defaultFileMode := 0644
 
-	fileName := yf.OutputPath
-	if !path.IsAbs(yf.OutputPath) {
-		fileName = path.Join(viper.GetString("outputDirectory"), yf.OutputPath)
+	fileName := yamlFile.OutputPath
+	if !path.IsAbs(yamlFile.OutputPath) {
+		fileName = path.Join(viper.GetString("outputDirectory"), yamlFile.OutputPath)
 	}
 
 	dirName := path.Dir(fileName)
@@ -107,17 +107,17 @@ func (cfg *Config) encodeNodes(nodes []*yaml.Node) (*bytes.Buffer, error) {
 
 	output := new(bytes.Buffer)
 
-	ye := yaml.NewEncoder(output)
+	yamlEncoder := yaml.NewEncoder(output)
 
 	defer func() {
 		if fileWritten {
-			if err := ye.Close(); err != nil {
+			if err := yamlEncoder.Close(); err != nil {
 				log.Criticalf("error closing encoder, %s", err)
 			}
 		}
 	}()
 
-	ye.SetIndent(viper.GetInt("indentLevel"))
+	yamlEncoder.SetIndent(viper.GetInt("indentLevel"))
 
 	for i, node := range nodes {
 		if len(node.Content) == 0 {
@@ -131,7 +131,7 @@ func (cfg *Config) encodeNodes(nodes []*yaml.Node) (*bytes.Buffer, error) {
 		style := actions.GetStyleFromConfig(viper.GetStringSlice("outputStyle")...)
 		actions.SetStyle(style, node)
 
-		err := ye.Encode(node)
+		err := yamlEncoder.Encode(node)
 		if err != nil {
 			return nil, fmt.Errorf("%w", err)
 		}
@@ -142,9 +142,9 @@ func (cfg *Config) encodeNodes(nodes []*yaml.Node) (*bytes.Buffer, error) {
 	return output, nil
 }
 
-func (cfg *Config) ReadAdHocPaths(i *Instructions) error {
+func (cfg *Config) ReadAdHocPaths(instructions *Instructions) error {
 	if cfg.Path != "" {
-		yfs := YamlFiles{
+		yamlFiles := YamlFiles{
 			&YamlFile{
 				Name:       "StdIn",
 				Path:       cfg.Path,
@@ -152,25 +152,25 @@ func (cfg *Config) ReadAdHocPaths(i *Instructions) error {
 			},
 		}
 
-		if err := yfs.expandDirectories(); err != nil {
+		if err := yamlFiles.expandDirectories(); err != nil {
 			return fmt.Errorf("%w", err)
 		}
 
-		for _, yf := range yfs {
-			if err := yf.readYamlFile(); err != nil {
+		for _, yamlFile := range yamlFiles {
+			if err := yamlFile.readYamlFile(); err != nil {
 				return err
 			}
 		}
 
-		i.YamlFiles = append(i.YamlFiles, yfs...)
+		instructions.YamlFiles = append(instructions.YamlFiles, yamlFiles...)
 
-		i.YamlFiles.mergeDuplicates()
+		instructions.YamlFiles.mergeDuplicates()
 	}
 
 	return nil
 }
 
-func (cfg *Config) ReadAdHocOverlays(i *Instructions) error {
+func (cfg *Config) ReadAdHocOverlays(instructions *Instructions) error {
 	if cfg.Overlay.Query != nil {
 		if err := yaml.Unmarshal([]byte(cfg.Value), &cfg.Overlay.Value); err != nil {
 			return fmt.Errorf("unable to read overlay value from flag, %w", err)
@@ -180,14 +180,14 @@ func (cfg *Config) ReadAdHocOverlays(i *Instructions) error {
 			cfg.Overlay.Value = *cfg.Overlay.Value.Content[0]
 		}
 
-		i.CommonOverlays = append(i.CommonOverlays, &cfg.Overlay)
+		instructions.CommonOverlays = append(instructions.CommonOverlays, &cfg.Overlay)
 	}
 
 	return nil
 }
 
-func determinePath(p string) string {
-	if p == "-" {
+func determinePath(filePath string) string {
+	if filePath == "-" {
 		return "stdin.yaml"
 	}
 

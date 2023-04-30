@@ -18,7 +18,7 @@ var log = logging.MustGetLogger("instructions") //nolint:gochecknoglobals
 
 // Execute takes in configuratation options and executes overlays on an instruction file specified.
 func Execute(cfg *Config) error {
-	eg, ctx := errgroup.WithContext(context.Background())
+	errorGroup, errorGroupContext := errgroup.WithContext(context.Background())
 
 	instructions, err := cfg.GetInstructions()
 	if err != nil {
@@ -30,7 +30,7 @@ func Execute(cfg *Config) error {
 	for _, yamlFile := range instructions.YamlFiles {
 		yf := yamlFile
 
-		eg.Go(
+		errorGroup.Go(
 			func() error {
 				stream := overlays.NewWorkStream()
 
@@ -45,8 +45,8 @@ func Execute(cfg *Config) error {
 				select {
 				case pChan <- yf:
 					return nil
-				case <-ctx.Done():
-					if err := ctx.Err(); err != nil {
+				case <-errorGroupContext.Done():
+					if err := errorGroupContext.Err(); err != nil {
 						return fmt.Errorf("%w", err)
 					}
 
@@ -57,7 +57,7 @@ func Execute(cfg *Config) error {
 	}
 
 	go func() {
-		eg.Wait() //nolint:errcheck // we use this to gracefully close the channel and receive the err later
+		errorGroup.Wait() //nolint:errcheck // we use this to gracefully close the channel and receive the err later
 		close(pChan)
 	}()
 
@@ -65,7 +65,7 @@ func Execute(cfg *Config) error {
 		return err
 	}
 
-	if err := eg.Wait(); err != nil {
+	if err := errorGroup.Wait(); err != nil {
 		return fmt.Errorf("%w", err)
 	}
 
@@ -75,8 +75,8 @@ func Execute(cfg *Config) error {
 // PostProcessHandler waits for YamlFile objects and preforms post overlay tasks like rendering,
 // saving to file or displaying to screen.
 func PostProcessHandler(cfg *Config, pChan <-chan *YamlFile) error {
-	for yf := range pChan {
-		if err := cfg.doPostProcessing(yf); err != nil {
+	for yamlFile := range pChan {
+		if err := cfg.doPostProcessing(yamlFile); err != nil {
 			return err
 		}
 	}

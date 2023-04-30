@@ -14,6 +14,6 @@ type Document struct {
 }
 
 // checkDocumentIndex checks to see if the current index matches a Document's path.
-func (d *Document) checkDocumentIndex(docIndex int) bool {
-	return d.Path == docIndex
+func (document *Document) checkDocumentIndex(documentIndex int) bool {
+	return document.Path == documentIndex
 }

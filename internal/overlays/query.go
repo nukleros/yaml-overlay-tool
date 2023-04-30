@@ -19,80 +19,80 @@ type Query struct {
 
 type Queries []Query
 
-func (q *Query) UnmarshalYAML(value *yaml.Node) error {
-	var s string
+func (query *Query) UnmarshalYAML(value *yaml.Node) error {
+	var queryString string
 
-	if err := value.Decode(&s); err != nil {
+	if err := value.Decode(&queryString); err != nil {
 		return fmt.Errorf("%w at line %d column %d", err, value.Line, value.Column)
 	}
 
-	p, err := yamlpath.NewPath(s)
+	yamlPath, err := yamlpath.NewPath(queryString)
 	if err != nil {
-		return fmt.Errorf("failed to parse the query path %s due to %w at line %d column %d", s, err, value.Line, value.Column)
+		return fmt.Errorf("failed to parse the query path %s due to %w at line %d column %d", queryString, err, value.Line, value.Column)
 	}
 
-	q.yamlPath = p
-	q.queryString = s
+	query.yamlPath = yamlPath
+	query.queryString = queryString
 
 	return nil
 }
 
-func (q Query) String() string {
-	return q.queryString
+func (query Query) String() string {
+	return query.queryString
 }
 
-func (q *Query) Find(node *yaml.Node) []*yaml.Node {
-	results, _ := q.yamlPath.Find(node)
+func (query *Query) Find(yamlNode *yaml.Node) []*yaml.Node {
+	results, _ := query.yamlPath.Find(yamlNode)
 
 	return results
 }
 
-func (mq *Queries) UnmarshalYAML(value *yaml.Node) error {
-	var q Query
+func (multipleQueries *Queries) UnmarshalYAML(value *yaml.Node) error {
+	var query Query
 
 	if value.Kind == yaml.ScalarNode {
-		if err := value.Decode(&q); err != nil {
+		if err := value.Decode(&query); err != nil {
 			return fmt.Errorf("%w at line %d column %d", err, value.Line, value.Column)
 		}
 
-		*mq = []Query{q}
+		*multipleQueries = []Query{query}
 
 		return nil
 	}
 
-	type qq []Query
+	type qualifiedQueries []Query
 
-	if err := value.Decode((*qq)(mq)); err != nil {
+	if err := value.Decode((*qualifiedQueries)(multipleQueries)); err != nil {
 		return fmt.Errorf("%w at line %d column %d", err, value.Line, value.Column)
 	}
 
 	return nil
 }
 
-func (mq *Queries) Paths() []string {
-	s := make([]string, len(*mq))
-	for i, q := range *mq {
-		s[i] = q.String()
+func (multipleQueries *Queries) Paths() []string {
+	queryPaths := make([]string, len(*multipleQueries))
+	for i, query := range *multipleQueries {
+		queryPaths[i] = query.String()
 	}
 
-	return s
+	return queryPaths
 }
 
-func (mq Queries) String() string {
-	return strings.Join(mq.Paths(), ",")
+func (multipleQueries Queries) String() string {
+	return strings.Join(multipleQueries.Paths(), ",")
 }
 
-func (mq *Queries) Find(node *yaml.Node) []*yaml.Node {
+func (multipleQueries *Queries) Find(yamlNode *yaml.Node) []*yaml.Node {
 	var results []*yaml.Node
 
-	for _, q := range *mq {
-		log.Debugf("searching path %s\n", q)
+	for _, query := range *multipleQueries {
+		log.Debugf("searching path %s\n", query)
 
-		if node.Kind == yaml.DocumentNode && len(node.Content) == 0 {
+		if yamlNode.Kind == yaml.DocumentNode && len(yamlNode.Content) == 0 {
 			continue
 		}
 
-		result := q.Find(node)
+		result := query.Find(yamlNode)
 
 		results = append(results, result...)
 	}
@@ -100,13 +100,13 @@ func (mq *Queries) Find(node *yaml.Node) []*yaml.Node {
 	return results
 }
 
-func (mq *Queries) Set(val string) error {
-	var q Query
-	if err := yaml.Unmarshal([]byte(val), &q); err != nil {
+func (multipleQueries *Queries) Set(value string) error {
+	var query Query
+	if err := yaml.Unmarshal([]byte(value), &query); err != nil {
 		return fmt.Errorf("%w", err)
 	}
 
-	*mq = append(*mq, q)
+	*multipleQueries = append(*multipleQueries, query)
 
 	return nil
 }

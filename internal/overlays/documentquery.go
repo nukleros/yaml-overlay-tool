@@ -21,15 +21,15 @@ type Condition struct {
 
 type DocumentQueries []*DocumentQuery
 
-func (dq DocumentQueries) checkQueries(node *yaml.Node) bool {
-	if len(dq) == 0 {
+func (docQuery DocumentQueries) checkQueries(node *yaml.Node) bool {
+	if len(docQuery) == 0 {
 		log.Debugf("No Document Queries found, continuing")
 
 		return true
 	}
 
-	for _, q := range dq {
-		if ok := q.checkQuery(node); ok {
+	for _, query := range docQuery {
+		if ok := query.checkQuery(node); ok {
 			log.Debugf("Document Query conditions were met, continuing")
 
 			return true
@@ -41,22 +41,22 @@ func (dq DocumentQueries) checkQueries(node *yaml.Node) bool {
 	return false
 }
 
-func (dq *DocumentQuery) checkQuery(node *yaml.Node) bool {
+func (docQuery *DocumentQuery) checkQuery(node *yaml.Node) bool {
 	compareOptions := cmpopts.IgnoreFields(yaml.Node{}, "HeadComment", "LineComment", "FootComment", "Line", "Column", "Style")
 
-	if dq.Conditions == nil {
+	if docQuery.Conditions == nil {
 		return true
 	}
 
-	for _, c := range dq.Conditions {
-		results := c.Query.Find(node)
+	for _, condition := range docQuery.Conditions {
+		results := condition.Query.Find(node)
 		if results == nil {
 			return false
 		}
 
-		if !c.Value.IsZero() {
+		if !condition.Value.IsZero() {
 			for _, result := range results {
-				if ok := cmp.Equal(*result, c.Value, compareOptions); !ok {
+				if ok := cmp.Equal(*result, condition.Value, compareOptions); !ok {
 					return false
 				}
 			}

@@ -12,11 +12,11 @@ import (
 	"github.com/nukleros/yaml-overlay-tool/internal/actions"
 )
 
-func (r *Root) initializeCommonFlags() {
-	r.Command.Flags().StringVar(&r.configFile, "config", r.configFile, "config file (default is $HOME/.yot)")
+func (rootCmd *Root) initializeCommonFlags() {
+	rootCmd.Command.Flags().StringVar(&rootCmd.configFile, "config", rootCmd.configFile, "config file (default is $HOME/.yot)")
 
-	if err := viper.BindPFlag("configFile", r.Command.Flags().Lookup("config")); err != nil {
-		r.Log.Fatal(err)
+	if err := viper.BindPFlag("configFile", rootCmd.Command.Flags().Lookup("config")); err != nil {
+		rootCmd.Log.Fatal(err)
 	}
 
 	logMap := map[logging.Level][]string{
@@ -28,94 +28,94 @@ func (r *Root) initializeCommonFlags() {
 		logging.DEBUG:    {"debug", "d", "verbose", "v"},
 	}
 
-	r.Command.Flags().VarP(
-		enumflag.New(&r.Options.LogLevel, "logLevel", logMap, enumflag.EnumCaseInsensitive),
+	rootCmd.Command.Flags().VarP(
+		enumflag.New(&rootCmd.Options.LogLevel, "logLevel", logMap, enumflag.EnumCaseInsensitive),
 		"log-level",
 		"v",
 		helpLogLevel,
 	)
 
-	r.Command.Flags().Lookup("log-level").NoOptDefVal = "debug"
+	rootCmd.Command.Flags().Lookup("log-level").NoOptDefVal = "debug"
 
-	if err := viper.BindPFlag("logLevel", r.Command.Flags().Lookup("log-level")); err != nil {
-		r.Log.Fatal(err)
+	if err := viper.BindPFlag("logLevel", rootCmd.Command.Flags().Lookup("log-level")); err != nil {
+		rootCmd.Log.Fatal(err)
 	}
 }
 
-func (r *Root) initializeOutputFlags() {
-	r.Command.Flags().StringVarP(
-		&r.Options.OutputDir,
+func (rootCmd *Root) initializeOutputFlags() {
+	rootCmd.Command.Flags().StringVarP(
+		&rootCmd.Options.OutputDir,
 		"output-directory",
 		"o",
 		"./output",
 		helpOutputDirectory,
 	)
 
-	if err := r.Command.MarkFlagDirname("output-directory"); err != nil {
-		r.Log.Fatal(err)
+	if err := rootCmd.Command.MarkFlagDirname("output-directory"); err != nil {
+		rootCmd.Log.Fatal(err)
 	}
 
-	r.Command.Flags().BoolVarP(
-		&r.Options.StdOut,
+	rootCmd.Command.Flags().BoolVarP(
+		&rootCmd.Options.StdOut,
 		"stdout",
 		"s",
 		false,
 		helpRenderStdOut,
 	)
 
-	if err := viper.BindPFlag("outputDirectory", r.Command.Flags().Lookup("output-directory")); err != nil {
-		r.Log.Fatal(err)
+	if err := viper.BindPFlag("outputDirectory", rootCmd.Command.Flags().Lookup("output-directory")); err != nil {
+		rootCmd.Log.Fatal(err)
 	}
 
-	if err := viper.BindPFlag("stdout", r.Command.Flags().Lookup("stdout")); err != nil {
-		r.Log.Fatal(err)
+	if err := viper.BindPFlag("stdout", rootCmd.Command.Flags().Lookup("stdout")); err != nil {
+		rootCmd.Log.Fatal(err)
 	}
 
 	viper.SetDefault("outputDirectory", "./output")
 }
 
-func (r *Root) initializeFormatFlags() {
+func (rootCmd *Root) initializeFormatFlags() {
 	defaultIndentLevel := 2
 
-	r.Command.Flags().IntVarP(
-		&r.Options.Indent,
+	rootCmd.Command.Flags().IntVarP(
+		&rootCmd.Options.Indent,
 		"indent-level",
 		"I",
 		defaultIndentLevel,
 		helpIndentLevel,
 	)
 
-	r.Command.Flags().VarP(
-		enumflag.NewSlice(&r.Options.Styles, "style", actions.Styles{}.FlagMap(), enumflag.EnumCaseInsensitive),
+	rootCmd.Command.Flags().VarP(
+		enumflag.NewSlice(&rootCmd.Options.Styles, "style", actions.Styles{}.FlagMap(), enumflag.EnumCaseInsensitive),
 		"output-style",
 		"S",
 		helpOutputStyle,
 	)
 
-	r.Command.Flags().BoolVarP(
-		&r.Options.RemoveComments,
+	rootCmd.Command.Flags().BoolVarP(
+		&rootCmd.Options.RemoveComments,
 		"remove-comments",
 		"",
 		false,
 		helpRemoveComments,
 	)
 
-	if err := viper.BindPFlag("removeComments", r.Command.Flags().Lookup("remove-comments")); err != nil {
-		r.Log.Fatal(err)
+	if err := viper.BindPFlag("removeComments", rootCmd.Command.Flags().Lookup("remove-comments")); err != nil {
+		rootCmd.Log.Fatal(err)
 	}
 
-	if err := viper.BindPFlag("indentLevel", r.Command.Flags().Lookup("indent-level")); err != nil {
-		r.Log.Fatal(err)
+	if err := viper.BindPFlag("indentLevel", rootCmd.Command.Flags().Lookup("indent-level")); err != nil {
+		rootCmd.Log.Fatal(err)
 	}
 
-	if err := viper.BindPFlag("outputStyle", r.Command.Flags().Lookup("output-style")); err != nil {
-		r.Log.Fatal(err)
+	if err := viper.BindPFlag("outputStyle", rootCmd.Command.Flags().Lookup("output-style")); err != nil {
+		rootCmd.Log.Fatal(err)
 	}
 }
 
-func (r *Root) initializeTemplateFlags() {
-	r.Command.Flags().StringArrayVarP(
-		&r.Options.ValueFiles,
+func (rootCmd *Root) initializeTemplateFlags() {
+	rootCmd.Command.Flags().StringArrayVarP(
+		&rootCmd.Options.ValueFiles,
 		"values-file",
 		"f",
 		nil,
@@ -123,54 +123,54 @@ func (r *Root) initializeTemplateFlags() {
 	)
 }
 
-func (r *Root) initializeInstructionFlags() {
-	r.Command.Flags().StringVarP(
-		&r.Options.InstructionsFile,
+func (rootCmd *Root) initializeInstructionFlags() {
+	rootCmd.Command.Flags().StringVarP(
+		&rootCmd.Options.InstructionsFile,
 		"instructions",
 		"i",
 		"",
 		helpInstructionsFile,
 	)
 
-	if err := r.Command.MarkFlagFilename("instructions"); err != nil {
-		r.Log.Error(err)
+	if err := rootCmd.Command.MarkFlagFilename("instructions"); err != nil {
+		rootCmd.Log.Error(err)
 	}
 
-	r.Command.Flags().Var(
-		&r.Options.DefaultOnMissingAction,
+	rootCmd.Command.Flags().Var(
+		&rootCmd.Options.DefaultOnMissingAction,
 		"default-on-missing-action",
 		helpDefaultOnMissingAction,
 	)
 
-	if err := viper.BindPFlag("defaultOnMissingAction", r.Command.Flags().Lookup("default-on-missing-action")); err != nil {
-		r.Log.Fatal(err)
+	if err := viper.BindPFlag("defaultOnMissingAction", rootCmd.Command.Flags().Lookup("default-on-missing-action")); err != nil {
+		rootCmd.Log.Fatal(err)
 	}
 }
 
-func (r *Root) initializeStdInFlags() {
-	r.Command.Flags().VarP(
-		&r.Options.Overlay.Query,
+func (rootCmd *Root) initializeStdInFlags() {
+	rootCmd.Command.Flags().VarP(
+		&rootCmd.Options.Overlay.Query,
 		"query",
 		"q",
 		helpQuery,
 	)
 
-	r.Command.Flags().VarP(
-		&r.Options.Overlay.Action,
+	rootCmd.Command.Flags().VarP(
+		&rootCmd.Options.Overlay.Action,
 		"action",
 		"a",
 		helpAction,
 	)
 
-	r.Command.Flags().StringVarP(
-		&r.Options.Value,
+	rootCmd.Command.Flags().StringVarP(
+		&rootCmd.Options.Value,
 		"value",
 		"x",
 		"",
 		helpValue,
 	)
-	r.Command.Flags().StringVarP(
-		&r.Options.Path,
+	rootCmd.Command.Flags().StringVarP(
+		&rootCmd.Options.Path,
 		"path",
 		"p",
 		"",

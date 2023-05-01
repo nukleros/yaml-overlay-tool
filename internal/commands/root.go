@@ -28,7 +28,7 @@ type Root struct {
 }
 
 func New() *Root {
-	rc := &Root{
+	rootCmd := &Root{
 		Log: logging.MustGetLogger("cmd"),
 		Options: &instructions.Config{
 			LogLevel:               logging.WARNING,
@@ -38,28 +38,28 @@ func New() *Root {
 		configFile: os.Getenv("YOT_CONFIG_FILE"),
 	}
 
-	cobra.OnInitialize(rc.initConfig)
+	cobra.OnInitialize(rootCmd.initConfig)
 
-	rc.Command = rc.NewCommand()
-	rc.AddFlags()
-	rc.AddCommands()
+	rootCmd.Command = rootCmd.NewCommand()
+	rootCmd.AddFlags()
+	rootCmd.AddCommands()
 
-	return rc
+	return rootCmd
 }
 
-func (r *Root) initConfig() {
+func (rootCmd *Root) initConfig() {
 	for k, v := range envMap() {
 		if err := viper.BindEnv(k, v); err != nil {
-			r.Log.Fatal(err)
+			rootCmd.Log.Fatal(err)
 		}
 	}
 
 	viper.SetConfigType("yaml")
 	viper.SetConfigName("yot.config")
 
-	if r.configFile != "" {
+	if rootCmd.configFile != "" {
 		// Use config file from the flag.
-		viper.SetConfigFile(r.configFile)
+		viper.SetConfigFile(rootCmd.configFile)
 	} else {
 		viper.AddConfigPath("./")
 		viper.AddConfigPath("$HOME/.yot/") // call multiple times to add many search paths
@@ -68,7 +68,7 @@ func (r *Root) initConfig() {
 
 	if err := viper.ReadInConfig(); err != nil {
 		if ok := errors.As(err, &viper.ConfigFileNotFoundError{}); !ok {
-			r.Log.Fatal(err)
+			rootCmd.Log.Fatal(err)
 		}
 
 		return
@@ -77,9 +77,9 @@ func (r *Root) initConfig() {
 	viper.Set("configFile", viper.ConfigFileUsed())
 }
 
-func (r Root) NewCommand() *cobra.Command {
-	// rootCmd represents the base command when called without any subcommands.
-	rootCmd := &cobra.Command{
+func (rootCmd Root) NewCommand() *cobra.Command {
+	// cmd represents the base command when called without any subcommands.
+	cmd := &cobra.Command{
 		Use:                        YotUse,
 		Aliases:                    []string{},
 		SuggestFor:                 []string{},
@@ -94,11 +94,11 @@ func (r Root) NewCommand() *cobra.Command {
 		Hidden:                     false,
 		Annotations:                map[string]string{},
 		Version:                    version,
-		PersistentPreRun:           r.SetupLogging,
+		PersistentPreRun:           rootCmd.SetupLogging,
 		PersistentPreRunE:          nil,
 		PreRun:                     nil,
 		PreRunE:                    nil,
-		RunE:                       r.Execute,
+		RunE:                       rootCmd.Execute,
 		PostRun:                    nil,
 		PostRunE:                   nil,
 		PersistentPostRun:          nil,
@@ -114,24 +114,24 @@ func (r Root) NewCommand() *cobra.Command {
 		FParseErrWhitelist:         cobra.FParseErrWhitelist{},
 	}
 
-	return rootCmd
+	return cmd
 }
 
-func (r *Root) AddFlags() {
-	r.initializeCommonFlags()
-	r.initializeInstructionFlags()
-	r.initializeOutputFlags()
-	r.initializeFormatFlags()
-	r.initializeTemplateFlags()
-	r.initializeStdInFlags()
+func (rootCmd *Root) AddFlags() {
+	rootCmd.initializeCommonFlags()
+	rootCmd.initializeInstructionFlags()
+	rootCmd.initializeOutputFlags()
+	rootCmd.initializeFormatFlags()
+	rootCmd.initializeTemplateFlags()
+	rootCmd.initializeStdInFlags()
 }
 
-func (r *Root) AddCommands() {
-	r.Command.AddCommand(r.CompletionCommand())
-	r.Command.AddCommand(r.EnvCommand())
+func (rootCmd *Root) AddCommands() {
+	rootCmd.Command.AddCommand(rootCmd.CompletionCommand())
+	rootCmd.Command.AddCommand(rootCmd.EnvCommand())
 }
 
-func (r *Root) SetupLogging(cmd *cobra.Command, args []string) {
+func (rootCmd *Root) SetupLogging(cmd *cobra.Command, args []string) {
 	cmd.SetOut(cmd.OutOrStdout())
 
 	format := logging.MustStringFormatter(
@@ -151,12 +151,12 @@ func (r *Root) SetupLogging(cmd *cobra.Command, args []string) {
 	logging.SetBackend(backend)
 
 	if viper.ConfigFileUsed() != "" {
-		r.Log.Debugf("Using config file: %s", viper.ConfigFileUsed())
+		rootCmd.Log.Debugf("Using config file: %s", viper.ConfigFileUsed())
 	}
 }
 
-func (r *Root) Execute(cmd *cobra.Command, args []string) error {
-	if err := instructions.Execute(r.Options); err != nil {
+func (rootCmd *Root) Execute(cmd *cobra.Command, args []string) error {
+	if err := instructions.Execute(rootCmd.Options); err != nil {
 		cmd.SilenceUsage = true
 
 		return fmt.Errorf("%w", err)
@@ -165,9 +165,9 @@ func (r *Root) Execute(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func (r *Root) Run() {
-	if err := r.Command.Execute(); err != nil {
-		r.Log.Error(err)
+func (rootCmd *Root) Run() {
+	if err := rootCmd.Command.Execute(); err != nil {
+		rootCmd.Log.Error(err)
 		os.Exit(1)
 	}
 }

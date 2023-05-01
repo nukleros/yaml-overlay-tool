@@ -12,7 +12,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-func (r *Root) EnvCommand() *cobra.Command {
+func (rootCmd *Root) EnvCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:                   "env [settingName]",
 		Short:                 envShort,
@@ -21,31 +21,31 @@ func (r *Root) EnvCommand() *cobra.Command {
 		Args:                  cobra.MaximumNArgs(1),
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 			if len(args) == 0 {
-				kmap := envMap()
-				keys := make([]string, len(kmap))
+				cfgKeyMap := envMap()
+				cfgKeys := make([]string, len(cfgKeyMap))
 				i := 0
-				for k := range kmap {
-					keys[i] = k
+				for cfgKey := range cfgKeyMap {
+					cfgKeys[i] = cfgKey
 					i++
 				}
 
-				return keys, cobra.ShellCompDirectiveNoFileComp
+				return cfgKeys, cobra.ShellCompDirectiveNoFileComp
 			}
 
 			return nil, cobra.ShellCompDirectiveNoFileComp
 		},
-		Run: r.env,
+		Run: rootCmd.env,
 	}
 }
 
-func (r *Root) env(cmd *cobra.Command, args []string) {
-	settings := envMap()
+func (rootCmd *Root) env(cmd *cobra.Command, args []string) {
+	cfgKeyMap := envMap()
 	if len(args) == 0 {
-		for k, v := range settings {
-			os.Stdout.WriteString(fmt.Sprintf("%s=\"%v\"\n", k, viper.Get(v)))
+		for cfgKey, cfgValue := range cfgKeyMap {
+			os.Stdout.WriteString(fmt.Sprintf("%s=\"%v\"\n", cfgKey, viper.Get(cfgValue)))
 		}
 	} else {
-		os.Stdout.WriteString(fmt.Sprintf("%s=\"%v\"\n", args[0], viper.Get(settings[args[0]])))
+		os.Stdout.WriteString(fmt.Sprintf("%s=\"%v\"\n", args[0], viper.Get(cfgKeyMap[args[0]])))
 	}
 }
 

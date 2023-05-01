@@ -14,21 +14,21 @@ import (
 )
 
 var (
-	// ErrMergeMustBeOfSameKind occurs when attempting to merge two different types.
-	ErrMergeMustBeOfSameKind = errors.New("both values must be of same type to use 'merge' action")
+	// ErrMergeMustBeOfSameType occurs when attempting to merge two different types.
+	ErrMergeMustBeOfSameType = errors.New("both values must be of same type to use 'merge' action")
 	// ErrMergeUnsupportedType occurs when an unsupported YAML type is attempted to be merged.
 	ErrMergeUnsupportedType = errors.New("not a supported yaml type for merging")
 )
 
-func MergeNode(nodes ...*yaml.Node) error {
-	if len(nodes) <= 1 {
+func MergeNode(yamlNodes ...*yaml.Node) error {
+	if len(yamlNodes) <= 1 {
 		return nil
 	}
 
-	o := nodes[0]
+	o := yamlNodes[0]
 
-	for _, n := range nodes[1:] {
-		if err := merge(o, n); err != nil {
+	for _, node := range yamlNodes[1:] {
+		if err := merge(o, node); err != nil {
 			return err
 		}
 	}
@@ -36,30 +36,30 @@ func MergeNode(nodes ...*yaml.Node) error {
 	return nil
 }
 
-func merge(o, n *yaml.Node, keyName ...string) error {
-	switch n.Kind {
+func merge(originalYamlNode, newYamlNode *yaml.Node, keyName ...string) error {
+	switch newYamlNode.Kind {
 	case yaml.DocumentNode:
-		return mergeDocument(o, n)
+		return mergeDocument(originalYamlNode, newYamlNode)
 	case yaml.MappingNode:
-		return mergeMap(o, n)
+		return mergeMap(originalYamlNode, newYamlNode)
 	case yaml.SequenceNode:
-		return mergeArray(o, n)
+		return mergeArray(originalYamlNode, newYamlNode)
 	case yaml.ScalarNode:
-		mergeScalar(o, n, keyName...)
+		mergeScalar(originalYamlNode, newYamlNode, keyName...)
 	case yaml.AliasNode:
-		return fmt.Errorf("%s is %w", o.LongTag(), ErrMergeUnsupportedType)
+		return fmt.Errorf("%s is %w", originalYamlNode.LongTag(), ErrMergeUnsupportedType)
 	}
 
-	o.Tag = n.Tag
+	originalYamlNode.Tag = newYamlNode.Tag
 
 	return nil
 }
 
-func mergeDocument(o, n *yaml.Node) error {
-	if o.Content != nil && n.Content != nil {
-		mergeComments(o, n, o.Value)
+func mergeDocument(originalYamlNode, newYamlNode *yaml.Node) error {
+	if originalYamlNode.Content != nil && newYamlNode.Content != nil {
+		mergeComments(originalYamlNode, newYamlNode, originalYamlNode.Value)
 
-		if err := merge(o.Content[0], n.Content[0], o.Value); err != nil {
+		if err := merge(originalYamlNode.Content[0], newYamlNode.Content[0], originalYamlNode.Value); err != nil {
 			return err
 		}
 	}
@@ -67,34 +67,34 @@ func mergeDocument(o, n *yaml.Node) error {
 	return nil
 }
 
-func mergeMap(o, n *yaml.Node) error {
-	for ni := 0; ni < len(n.Content)-1; ni += 2 {
+func mergeMap(originalYamlNode, newYamlNode *yaml.Node) error {
+	for newNodeIndex := 0; newNodeIndex < len(newYamlNode.Content)-1; newNodeIndex += 2 {
 		resultFound := false
 
-		if o.Kind != yaml.MappingNode {
-			o.Kind = yaml.MappingNode
-			o.Tag = "!!map"
-			o.Value = ""
-			o.Content = []*yaml.Node{}
+		if originalYamlNode.Kind != yaml.MappingNode {
+			originalYamlNode.Kind = yaml.MappingNode
+			originalYamlNode.Tag = "!!map"
+			originalYamlNode.Value = ""
+			originalYamlNode.Content = []*yaml.Node{}
 		}
 
-		for oi := 0; oi < len(o.Content)-1; oi += 2 {
+		for originalNodeIndex := 0; originalNodeIndex < len(originalYamlNode.Content)-1; originalNodeIndex += 2 {
 			var foundMarker bool
 
-			if foundMarker = checkForMarkers(n.Content[ni].Value); !foundMarker {
-				if o.Content[oi].Value != n.Content[ni].Value {
+			if foundMarker = checkForMarkers(newYamlNode.Content[newNodeIndex].Value); !foundMarker {
+				if originalYamlNode.Content[originalNodeIndex].Value != newYamlNode.Content[newNodeIndex].Value {
 					continue
 				}
 			}
 
 			resultFound = true
 
-			keyName := o.Content[oi].Value
-			value := o.Content[oi+1].Value
+			keyName := originalYamlNode.Content[originalNodeIndex].Value
+			value := originalYamlNode.Content[originalNodeIndex+1].Value
 
-			mergeComments(o.Content[oi], n.Content[ni], value, keyName)
+			mergeComments(originalYamlNode.Content[originalNodeIndex], newYamlNode.Content[newNodeIndex], value, keyName)
 
-			if err := merge(o.Content[oi+1], n.Content[ni+1], keyName); err != nil {
+			if err := merge(originalYamlNode.Content[originalNodeIndex+1], newYamlNode.Content[newNodeIndex+1], keyName); err != nil {
 				return err
 			}
 
@@ -102,11 +102,11 @@ func mergeMap(o, n *yaml.Node) error {
 				break
 			}
 
-			mergeScalar(o.Content[oi], n.Content[ni], value, keyName)
+			mergeScalar(originalYamlNode.Content[originalNodeIndex], newYamlNode.Content[newNodeIndex], value, keyName)
 		}
 
 		if !resultFound {
-			if err := addNode(o, n.Content[ni:ni+2]...); err != nil {
+			if err := addNode(originalYamlNode, newYamlNode.Content[newNodeIndex:newNodeIndex+2]...); err != nil {
 				return err
 			}
 		}
@@ -115,18 +115,18 @@ func mergeMap(o, n *yaml.Node) error {
 	return nil
 }
 
-func mergeArray(o, n *yaml.Node) error {
-	if o.Kind != yaml.SequenceNode {
-		o.Kind = yaml.SequenceNode
-		o.Tag = "!!seq"
-		o.Value = ""
-		o.Content = []*yaml.Node{}
+func mergeArray(originalYamlNode, newYamlNode *yaml.Node) error {
+	if originalYamlNode.Kind != yaml.SequenceNode {
+		originalYamlNode.Kind = yaml.SequenceNode
+		originalYamlNode.Tag = "!!seq"
+		originalYamlNode.Value = ""
+		originalYamlNode.Content = []*yaml.Node{}
 	}
 
-	if n.Content != nil {
-		mergeComments(o, n, o.Value)
+	if newYamlNode.Content != nil {
+		mergeComments(originalYamlNode, newYamlNode, originalYamlNode.Value)
 
-		if err := addNode(o, n.Content...); err != nil {
+		if err := addNode(originalYamlNode, newYamlNode.Content...); err != nil {
 			return err
 		}
 	}
@@ -134,83 +134,83 @@ func mergeArray(o, n *yaml.Node) error {
 	return nil
 }
 
-func mergeScalar(o, n *yaml.Node, values ...string) {
+func mergeScalar(originalYamlNode, newYamlNode *yaml.Node, values ...string) {
 	var keyName string
 
 	var value string
 
-	hc := strings.TrimPrefix(o.HeadComment, "#")
-	lc := strings.TrimPrefix(o.LineComment, "#")
-	fc := strings.TrimPrefix(o.FootComment, "#")
+	headComment := strings.TrimPrefix(originalYamlNode.HeadComment, "#")
+	lineComment := strings.TrimPrefix(originalYamlNode.LineComment, "#")
+	footComment := strings.TrimPrefix(originalYamlNode.FootComment, "#")
 
-	mergeComments(o, n, values...)
+	mergeComments(originalYamlNode, newYamlNode, values...)
 
 	switch {
 	case values == nil:
-		value = o.Value
+		value = originalYamlNode.Value
 		keyName = ""
 	case len(values) > 1:
 		value = values[0]
 		keyName = values[1]
 	case len(values) == 1:
-		value = o.Value
+		value = originalYamlNode.Value
 		keyName = values[0]
 	}
 
-	if o.Kind != yaml.ScalarNode {
-		o.Kind = yaml.ScalarNode
-		o.Value = ""
-		o.Content = nil
+	if originalYamlNode.Kind != yaml.ScalarNode {
+		originalYamlNode.Kind = yaml.ScalarNode
+		originalYamlNode.Value = ""
+		originalYamlNode.Content = nil
 	}
 
-	o.Value = format(n.Value, value, lc, hc, fc, keyName)
+	originalYamlNode.Value = format(newYamlNode.Value, value, lineComment, headComment, footComment, keyName)
 }
 
-func mergeComments(o, n *yaml.Node, values ...string) {
+func mergeComments(originalYamlNode, newYamlNode *yaml.Node, values ...string) {
 	var keyName string
 
 	var value string
 
-	lc := strings.TrimPrefix(o.LineComment, "#")
-	hc := strings.TrimPrefix(o.HeadComment, "#")
-	fc := strings.TrimPrefix(o.FootComment, "#")
+	lineComment := strings.TrimPrefix(originalYamlNode.LineComment, "#")
+	headComment := strings.TrimPrefix(originalYamlNode.HeadComment, "#")
+	footComment := strings.TrimPrefix(originalYamlNode.FootComment, "#")
 
 	switch {
 	case values == nil:
-		value = o.Value
+		value = originalYamlNode.Value
 		keyName = ""
 	case len(values) > 1:
 		value = values[0]
 		keyName = values[1]
 	case len(values) == 1:
-		value = o.Value
+		value = originalYamlNode.Value
 		keyName = values[0]
 	}
 
 	switch {
-	case n.HeadComment != "":
-		o.HeadComment = format(n.HeadComment, value, lc, hc, fc, keyName)
+	case newYamlNode.HeadComment != "":
+		originalYamlNode.HeadComment = format(newYamlNode.HeadComment, value, lineComment, headComment, footComment, keyName)
 
 		fallthrough
-	case n.LineComment != "":
-		o.LineComment = format(n.LineComment, value, lc, hc, fc, keyName)
+	case newYamlNode.LineComment != "":
+		originalYamlNode.LineComment = format(newYamlNode.LineComment, value, lineComment, headComment, footComment, keyName)
 
 		fallthrough
-	case n.FootComment != "":
-		o.FootComment = format(n.FootComment, value, lc, hc, fc, keyName)
+	case newYamlNode.FootComment != "":
+		originalYamlNode.FootComment = format(newYamlNode.FootComment, value, lineComment, headComment, footComment, keyName)
 	}
 }
 
-func addNode(o *yaml.Node, nv ...*yaml.Node) error {
-	temp := make([]*yaml.Node, len(nv))
+func addNode(originalYamlNode *yaml.Node, newNodeValues ...*yaml.Node) error {
+	additionalNodes := make([]*yaml.Node, len(newNodeValues))
 
-	if err := reprint.FromTo(&nv, &temp); err != nil {
+	if err := reprint.FromTo(&newNodeValues, &additionalNodes); err != nil {
 		return fmt.Errorf("failed to insert value during merge: %w", err)
 	}
 
-	sanitizeNode(temp...)
+	sanitizeNode(additionalNodes...)
 
-	o.Content = append(o.Content, temp...)
+	originalYamlNode.Content = append(originalYamlNode.Content, additionalNodes...)
 
 	return nil
 }

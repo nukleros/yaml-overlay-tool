@@ -21,15 +21,15 @@ const (
 	KeyMarker = `%k`
 )
 
-func checkForMarkers(s string) bool {
-	for _, m := range []string{
+func checkForMarkers(decodedYaml string) bool {
+	for _, marker := range []string{
 		ValueMarker,
 		LineCommentMarker,
 		HeadCommentMarker,
 		FootCommentMarker,
 		KeyMarker,
 	} {
-		if strings.Contains(s, m) {
+		if strings.Contains(decodedYaml, marker) {
 			return true
 		}
 	}

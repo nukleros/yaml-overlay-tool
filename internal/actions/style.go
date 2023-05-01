@@ -31,7 +31,7 @@ const (
 	NormalStyle
 )
 
-func (s Style) String() string {
+func (style Style) String() string {
 	toString := map[Style]string{
 		NormalStyle:       "normal",
 		TaggedStyle:       "tagged",
@@ -42,10 +42,10 @@ func (s Style) String() string {
 		FlowStyle:         "flow",
 	}
 
-	return toString[s]
+	return toString[style]
 }
 
-func (ss Styles) FlagMap() map[Style][]string {
+func (styles Styles) FlagMap() map[Style][]string {
 	return map[Style][]string{
 		NormalStyle:       {"normal", "n"},
 		TaggedStyle:       {"tagged", "tag", "t"},
@@ -57,40 +57,40 @@ func (ss Styles) FlagMap() map[Style][]string {
 	}
 }
 
-func (ss Styles) GetStyle() Style {
-	var s Style
-	for _, v := range ss {
-		s += v
+func (styles Styles) GetStyle() Style {
+	var style Style
+	for _, v := range styles {
+		style += v
 	}
 
-	return s
+	return style
 }
 
-func SetStyle(ss Styles, n ...*yaml.Node) {
-	s := ss.GetStyle()
-	setStyle(s, n...)
+func SetStyle(styles Styles, yamlNode ...*yaml.Node) {
+	style := styles.GetStyle()
+	setStyle(style, yamlNode...)
 }
 
-func setStyle(s Style, n ...*yaml.Node) {
-	for _, nv := range n {
-		switch nv.Kind {
+func setStyle(style Style, yamlNode ...*yaml.Node) {
+	for _, nodeValue := range yamlNode {
+		switch nodeValue.Kind {
 		case yaml.DocumentNode, yaml.MappingNode, yaml.SequenceNode, yaml.AliasNode:
-			nv.Style = yaml.Style(s)
+			nodeValue.Style = yaml.Style(style)
 
-			setStyle(s, nv.Content...)
+			setStyle(style, nodeValue.Content...)
 		case yaml.ScalarNode:
-			nv.Style = yaml.Style(s)
+			nodeValue.Style = yaml.Style(style)
 		}
 	}
 }
 
-func GetStyleFromConfig(v ...string) Styles {
+func GetStyleFromConfig(configValue ...string) Styles {
 	var result Styles
 
-	for _, ss := range v {
-		ssp := strings.Split(strings.Trim(strings.ToLower(ss), "[]"), ",")
-		for _, s := range ssp {
-			switch s {
+	for _, styles := range configValue {
+		stylesSplit := strings.Split(strings.Trim(strings.ToLower(styles), "[]"), ",")
+		for _, style := range stylesSplit {
+			switch style {
 			case "normal", "n":
 				result = append(result, NormalStyle)
 			case "tagged", "tag", "t":

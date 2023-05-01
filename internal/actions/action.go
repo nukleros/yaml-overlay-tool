@@ -33,7 +33,7 @@ const (
 	Combine
 )
 
-func (a Action) String() string {
+func (action Action) String() string {
 	toString := map[Action]string{
 		Invalid: "",
 		Merge:   "merge",
@@ -42,17 +42,17 @@ func (a Action) String() string {
 		Combine: "combine",
 	}
 
-	return toString[a]
+	return toString[action]
 }
 
-func (a *Action) UnmarshalYAML(value *yaml.Node) error {
-	var y string
+func (action *Action) UnmarshalYAML(yamlNode *yaml.Node) error {
+	var decodedYaml string
 
-	if err := value.Decode(&y); err != nil {
-		return fmt.Errorf("%w at line %d column %d", err, value.Line, value.Column)
+	if err := yamlNode.Decode(&decodedYaml); err != nil {
+		return fmt.Errorf("%w at line %d column %d", err, yamlNode.Line, yamlNode.Column)
 	}
 
-	y = strings.ToLower(y)
+	decodedYaml = strings.ToLower(decodedYaml)
 
 	toID := map[string]Action{
 		"":        Invalid,
@@ -62,28 +62,28 @@ func (a *Action) UnmarshalYAML(value *yaml.Node) error {
 		"combine": Combine,
 	}
 
-	if toID[y] == Invalid {
-		return fmt.Errorf("%w, %s", ErrInvalidAction, y)
+	if toID[decodedYaml] == Invalid {
+		return fmt.Errorf("%w, %s", ErrInvalidAction, decodedYaml)
 	}
 
-	*a = toID[y]
+	*action = toID[decodedYaml]
 
 	return nil
 }
 
-func (a Action) MarshalYAML() (interface{}, error) {
-	return a.String(), nil
+func (action Action) MarshalYAML() (interface{}, error) {
+	return action.String(), nil
 }
 
-func (a *Action) Set(val string) error {
-	if err := yaml.Unmarshal([]byte(val), a); err != nil {
+func (action *Action) Set(value string) error {
+	if err := yaml.Unmarshal([]byte(value), action); err != nil {
 		return fmt.Errorf("%w", err)
 	}
 
 	return nil
 }
 
-func (a *Action) Type() string {
+func (action *Action) Type() string {
 	return "actions.Action"
 }
 
@@ -98,24 +98,24 @@ const (
 	Inject
 )
 
-func (a OnMissingAction) String() string {
+func (action OnMissingAction) String() string {
 	toString := map[OnMissingAction]string{
 		Default: "default",
 		Ignore:  "ignore",
 		Inject:  "inject",
 	}
 
-	return toString[a]
+	return toString[action]
 }
 
-func (a *OnMissingAction) UnmarshalYAML(value *yaml.Node) error {
-	var y string
+func (action *OnMissingAction) UnmarshalYAML(value *yaml.Node) error {
+	var decodedYaml string
 
-	if err := value.Decode(&y); err != nil {
+	if err := value.Decode(&decodedYaml); err != nil {
 		return fmt.Errorf("%w at line %d column %d", err, value.Line, value.Column)
 	}
 
-	y = strings.ToLower(y)
+	decodedYaml = strings.ToLower(decodedYaml)
 
 	toID := map[string]OnMissingAction{
 		"default": Default,
@@ -123,23 +123,23 @@ func (a *OnMissingAction) UnmarshalYAML(value *yaml.Node) error {
 		"inject":  Inject,
 	}
 
-	*a = toID[y]
+	*action = toID[decodedYaml]
 
 	return nil
 }
 
-func (a OnMissingAction) MarshalYAML() (interface{}, error) {
-	return a.String(), nil
+func (action OnMissingAction) MarshalYAML() (interface{}, error) {
+	return action.String(), nil
 }
 
-func (a *OnMissingAction) Set(val string) error {
-	if err := yaml.Unmarshal([]byte(val), a); err != nil {
+func (action *OnMissingAction) Set(val string) error {
+	if err := yaml.Unmarshal([]byte(val), action); err != nil {
 		return fmt.Errorf("%w", err)
 	}
 
 	return nil
 }
 
-func (a *OnMissingAction) Type() string {
+func (action *OnMissingAction) Type() string {
 	return "actions.OnMissingAction"
 }

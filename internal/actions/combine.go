@@ -24,32 +24,32 @@ func CombineNode(originalValue, newValue *yaml.Node) error {
 
 	switch originalValue.Tag {
 	case "!!int":
-		o, err := strconv.Atoi(originalValue.Value)
+		original, err := strconv.Atoi(originalValue.Value)
 		if err != nil {
 			return fmt.Errorf("failed to %s to int for merging: %w", originalValue.Value, err)
 		}
 
-		n, err := strconv.Atoi(newValue.Value)
+		newValueInt, err := strconv.Atoi(newValue.Value)
 		if err != nil {
 			return fmt.Errorf("failed to %s to int for merging: %w", newValue.Value, err)
 		}
 
-		originalValue.Value = strconv.Itoa(o + n)
+		originalValue.Value = strconv.Itoa(original + newValueInt)
 
 		return nil
 
 	case "!!bool":
-		o, err := strconv.ParseBool(originalValue.Value)
+		original, err := strconv.ParseBool(originalValue.Value)
 		if err != nil {
 			return fmt.Errorf("failed to %s to bool for merging: %w", originalValue.Value, err)
 		}
 
-		n, err := strconv.ParseBool(newValue.Value)
+		newValueBool, err := strconv.ParseBool(newValue.Value)
 		if err != nil {
 			return fmt.Errorf("failed to %s to bool for merging: %w", newValue.Value, err)
 		}
 
-		originalValue.Value = strconv.FormatBool(o && n)
+		originalValue.Value = strconv.FormatBool(original && newValueBool)
 
 		return nil
 	}

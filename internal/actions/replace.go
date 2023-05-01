@@ -11,17 +11,17 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func ReplaceNode(original, replace *yaml.Node) error {
-	ov := *original
+func ReplaceNode(orignalYamlNode, replacementYamlNode *yaml.Node) error {
+	originalValue := *orignalYamlNode
 
-	if err := reprint.FromTo(replace, original); err != nil {
+	if err := reprint.FromTo(replacementYamlNode, orignalYamlNode); err != nil {
 		return fmt.Errorf("failed to replace value: %w", err)
 	}
 
-	mergeComments(&ov, original)
-	original.HeadComment = ov.HeadComment
-	original.LineComment = ov.LineComment
-	original.FootComment = ov.FootComment
+	mergeComments(&originalValue, orignalYamlNode)
+	orignalYamlNode.HeadComment = originalValue.HeadComment
+	orignalYamlNode.LineComment = originalValue.LineComment
+	orignalYamlNode.FootComment = originalValue.FootComment
 
 	return nil
 }

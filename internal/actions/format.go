@@ -13,32 +13,32 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-func format(formatStr string, v ...interface{}) string {
-	v = sanitizeValues(v...)
+func format(formatStr string, values ...interface{}) string {
+	values = sanitizeValues(values...)
 
-	return doFormat(formatStr, v...)
+	return doFormat(formatStr, values...)
 }
 
-func sanitizeNode(n ...*yaml.Node) {
-	for _, nv := range n {
-		if nv == nil {
+func sanitizeNode(yamlNode ...*yaml.Node) {
+	for _, nodeValue := range yamlNode {
+		if nodeValue == nil {
 			continue
 		}
 
-		switch nv.Kind {
+		switch nodeValue.Kind {
 		case yaml.DocumentNode, yaml.MappingNode, yaml.SequenceNode, yaml.AliasNode:
-			sanitizeNode(nv.Content...)
+			sanitizeNode(nodeValue.Content...)
 		case yaml.ScalarNode:
 		}
 
-		values := []*string{&nv.Value, &nv.HeadComment, &nv.LineComment, &nv.FootComment}
-		for _, v := range values {
-			*v = format(*v, "", "", "", "", "")
+		values := []*string{&nodeValue.Value, &nodeValue.HeadComment, &nodeValue.LineComment, &nodeValue.FootComment}
+		for _, value := range values {
+			*value = format(*value, "", "", "", "", "")
 		}
 	}
 }
 
-func sanitizeValues(v ...interface{}) []interface{} {
+func sanitizeValues(values ...interface{}) []interface{} {
 	for _, t := range []string{
 		ValueMarker,
 		LineCommentMarker,
@@ -46,16 +46,16 @@ func sanitizeValues(v ...interface{}) []interface{} {
 		FootCommentMarker,
 		KeyMarker,
 	} {
-		for j := range v {
+		for j := range values {
 			//nolint:forcetypeassert
-			v[j] = strings.ReplaceAll(v[j].(string), t, "")
+			values[j] = strings.ReplaceAll(values[j].(string), t, "")
 		}
 	}
 
-	return v
+	return values
 }
 
-func doFormat(s string, values ...interface{}) string {
+func doFormat(formatString string, values ...interface{}) string {
 	markers := []string{
 		ValueMarker,
 		LineCommentMarker,
@@ -66,20 +66,20 @@ func doFormat(s string, values ...interface{}) string {
 
 	valueMap := map[string]string{}
 
-	for i, v := range markers {
-		if sv, ok := values[i].(string); ok {
-			valueMap[v] = sv
+	for i, value := range markers {
+		if stringValue, ok := values[i].(string); ok {
+			valueMap[value] = stringValue
 		}
 	}
 
-	re := regexp.MustCompile(`(?P<marker>%[vklfh])(?P<format>{(?P<command>.*?)})?`)
+	formatMarkerRegex := regexp.MustCompile(`(?P<marker>%[vklfh])(?P<format>{(?P<command>.*?)})?`)
 
-	matches := re.FindAllStringSubmatch(s, -1)
+	formatMarkerMatches := formatMarkerRegex.FindAllStringSubmatch(formatString, -1)
 
-	for _, match := range matches {
+	for _, match := range formatMarkerMatches {
 		result := make(map[string]string)
 
-		for i, name := range re.SubexpNames() {
+		for i, name := range formatMarkerRegex.SubexpNames() {
 			if i != 0 && name != "" {
 				result[name] = match[i]
 			}
@@ -93,30 +93,30 @@ func doFormat(s string, values ...interface{}) string {
 
 				marker, err = processSedCommand(result["command"], valueMap[result["marker"]])
 				if err != nil {
-					log.Warningf("Skipping additional format on [%s] due to invalid sed exp [%s], %s", s, result["command"], err)
+					log.Warningf("Skipping additional format on [%s] due to invalid sed exp [%s], %s", formatString, result["command"], err)
 				}
 			}
 
-			s = strings.Replace(s, match[0], marker, 1)
+			formatString = strings.Replace(formatString, match[0], marker, 1)
 		}
 	}
 
-	return s
+	return formatString
 }
 
-func processSedCommand(command, value string) (string, error) {
-	engine, err := sed.New(strings.NewReader(command))
+func processSedCommand(sedCommand, sedResult string) (string, error) {
+	sedEngine, err := sed.New(strings.NewReader(sedCommand))
 	if err != nil {
-		return value, fmt.Errorf("sed error: %w", err)
+		return sedResult, fmt.Errorf("sed error: %w", err)
 	}
 
-	value, err = engine.RunString(value)
+	sedResult, err = sedEngine.RunString(sedResult)
 	if err != nil {
-		return value, fmt.Errorf("sed error: %w", err)
+		return sedResult, fmt.Errorf("sed error: %w", err)
 	}
 
-	value = strings.TrimSuffix(value, "\n")
-	value = strings.TrimPrefix(value, "\n")
+	sedResult = strings.TrimSuffix(sedResult, "\n")
+	sedResult = strings.TrimPrefix(sedResult, "\n")
 
-	return value, nil
+	return sedResult, nil
 }

@@ -106,7 +106,7 @@ func (tst testCases) runTests(t *testing.T, a string) {
 			}
 
 			if buf.String() != testCase.expectedValue {
-				t.Errorf("%s() =\n%swant:\n%s", a, buf.String(), tt.expectedValue)
+				t.Errorf("%s() =\n%swant:\n%s", a, buf.String(), testCase.expectedValue)
 			}
 		})
 	}

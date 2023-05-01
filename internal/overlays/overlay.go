@@ -25,28 +25,28 @@ type Overlay struct {
 	DocumentIndex []int           `yaml:"documentIndex,omitempty"`
 }
 
-func (o *Overlay) Apply(n *yaml.Node) error {
-	log.Debugf("Checking Document Queries for [%q]", o.Name)
+func (overlay *Overlay) Apply(yamlNode *yaml.Node) error {
+	log.Debugf("Checking Document Queries for [%q]", overlay.Name)
 
-	if ok := o.DocumentQuery.checkQueries(n); !ok {
+	if ok := overlay.DocumentQuery.checkQueries(yamlNode); !ok {
 		return nil
 	}
 
-	results := o.Query.Find(n)
+	results := overlay.Query.Find(yamlNode)
 
 	if results == nil {
 		log.Debugf("No results found checking onMissing")
 
-		return o.onMissing(n)
+		return overlay.onMissing(yamlNode)
 	}
 
-	return o.doAction(n, results)
+	return overlay.doAction(yamlNode, results)
 }
 
-func (o *Overlay) CheckDocumentIndex(current int) bool {
-	if o.DocumentIndex != nil {
-		for _, i := range o.DocumentIndex {
-			if current == i {
+func (overlay *Overlay) CheckDocumentIndex(currentIndex int) bool {
+	if overlay.DocumentIndex != nil {
+		for _, documentIndex := range overlay.DocumentIndex {
+			if currentIndex == documentIndex {
 				return true
 			}
 		}
@@ -57,24 +57,24 @@ func (o *Overlay) CheckDocumentIndex(current int) bool {
 	return true
 }
 
-func (o *Overlay) doAction(root *yaml.Node, nodes []*yaml.Node) error {
-	for _, n := range nodes {
-		log.Debugf("applying overlay [%q], %s at line %d column %d\n", o.Name, o.Action, n.Line, n.Column)
+func (overlay *Overlay) doAction(root *yaml.Node, yamlNodes []*yaml.Node) error {
+	for _, yamlNode := range yamlNodes {
+		log.Debugf("applying overlay [%q], %s at line %d column %d\n", overlay.Name, overlay.Action, yamlNode.Line, yamlNode.Column)
 
-		switch o.Action {
+		switch overlay.Action {
 		case actions.Delete:
-			actions.DeleteNode(root, n)
+			actions.DeleteNode(root, yamlNode)
 		case actions.Replace:
-			if err := actions.ReplaceNode(n, &o.Value); err != nil {
-				return fmt.Errorf("%w, skipping replace on line %d column %d", err, n.Line, n.Column)
+			if err := actions.ReplaceNode(yamlNode, &overlay.Value); err != nil {
+				return fmt.Errorf("%w, skipping replace on line %d column %d", err, yamlNode.Line, yamlNode.Column)
 			}
 		case actions.Combine:
-			if err := actions.CombineNode(n, &o.Value); err != nil {
-				return fmt.Errorf("%w, skipping combine on line %d, column %d", err, n.Line, n.Column)
+			if err := actions.CombineNode(yamlNode, &overlay.Value); err != nil {
+				return fmt.Errorf("%w, skipping combine on line %d, column %d", err, yamlNode.Line, yamlNode.Column)
 			}
 		default:
-			if err := actions.MergeNode(n, &o.Value); err != nil {
-				return fmt.Errorf("%w, skipping merge on line %d, column %d", err, n.Line, n.Column)
+			if err := actions.MergeNode(yamlNode, &overlay.Value); err != nil {
+				return fmt.Errorf("%w, skipping merge on line %d, column %d", err, yamlNode.Line, yamlNode.Column)
 			}
 		}
 	}
@@ -82,18 +82,18 @@ func (o *Overlay) doAction(root *yaml.Node, nodes []*yaml.Node) error {
 	return nil
 }
 
-func (o *Overlay) UnmarshalYAML(value *yaml.Node) error {
-	type temp Overlay
+func (overlay *Overlay) UnmarshalYAML(value *yaml.Node) error {
+	type decodedOverlay Overlay
 
-	if err := value.Decode((*temp)(o)); err != nil {
+	if err := value.Decode((*decodedOverlay)(overlay)); err != nil {
 		return fmt.Errorf("failed to unmarshal overlay due to %w at line %d column %d", err, value.Line, value.Column)
 	}
 
 	switch "" {
-	case o.Name:
-		o.Name = o.Query.String()
-	case o.Action.String():
-		o.Action = actions.Merge
+	case overlay.Name:
+		overlay.Name = overlay.Query.String()
+	case overlay.Action.String():
+		overlay.Action = actions.Merge
 	}
 
 	return nil

@@ -111,6 +111,6 @@ func (multipleQueries *Queries) Set(value string) error {
 	return nil
 }
 
-func (mq *Queries) Type() string {
+func (multipleQueries *Queries) Type() string {
 	return "overlays.Queries"
 }

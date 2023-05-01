@@ -42,10 +42,10 @@ func (rootCmd *Root) env(cmd *cobra.Command, args []string) {
 	cfgKeyMap := envMap()
 	if len(args) == 0 {
 		for cfgKey, cfgValue := range cfgKeyMap {
-			os.Stdout.WriteString(fmt.Sprintf("%s=\"%v\"\n", cfgKey, viper.Get(cfgValue)))
+			fmt.Fprintf(os.Stdout, "%s=\"%v\"\n", cfgKey, viper.Get(cfgValue))
 		}
 	} else {
-		os.Stdout.WriteString(fmt.Sprintf("%s=\"%v\"\n", args[0], viper.Get(cfgKeyMap[args[0]])))
+		fmt.Fprintf(os.Stdout, "%s=\"%v\"\n", args[0], viper.Get(cfgKeyMap[args[0]]))
 	}
 }
 

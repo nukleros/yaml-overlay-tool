@@ -127,7 +127,9 @@ func (cfg *Config) encodeNodes(nodes []*yaml.Node) (*bytes.Buffer, error) {
 		}
 
 		style := actions.GetStyleFromConfig(viper.GetStringSlice("outputStyle")...)
-		actions.SetStyle(style, node)
+		if len(style) > 0 {
+			actions.SetStyle(style, node)
+		}
 
 		err := ye.Encode(node)
 		if err != nil {

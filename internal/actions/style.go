@@ -65,6 +65,16 @@ func (ss Styles) GetStyle() Style {
 	return s
 }
 
+// yaml11OnlyBooleans are YAML 1.1-only keywords that go-yaml v3's encoder does
+// not automatically quote when tag is !!str and style is 0.  (YAML 1.2 keywords
+// such as true/false/null/~ are already handled by the encoder itself.)
+var yaml11OnlyBooleans = map[string]bool{ //nolint:gochecknoglobals
+	"y": true, "Y": true, "yes": true, "Yes": true, "YES": true,
+	"n": true, "N": true, "no": true, "No": true, "NO": true,
+	"on": true, "On": true, "ON": true,
+	"off": true, "Off": true, "OFF": true,
+}
+
 func SetStyle(ss Styles, n ...*yaml.Node) {
 	s := ss.GetStyle()
 	setStyle(s, n...)
@@ -78,7 +88,16 @@ func setStyle(s Style, n ...*yaml.Node) {
 
 			setStyle(s, nv.Content...)
 		case yaml.ScalarNode:
-			nv.Style = yaml.Style(s)
+			newStyle := yaml.Style(s)
+			// go-yaml v3 does not quote YAML 1.1-only boolean keywords (on/off/yes/no/y/n)
+			// when tag is !!str and style is 0; the encoder only auto-quotes YAML 1.2 keywords.
+			// Force double-quoting so the string type survives a round-trip.
+			if nv.Tag == "!!str" && yaml11OnlyBooleans[nv.Value] &&
+				newStyle&(yaml.DoubleQuotedStyle|yaml.SingleQuotedStyle) == 0 {
+				newStyle = yaml.DoubleQuotedStyle
+			}
+
+			nv.Style = newStyle
 		}
 	}
 }

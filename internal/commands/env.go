@@ -22,6 +22,7 @@ func (r *Root) EnvCommand() *cobra.Command {
 			if len(args) == 0 {
 				kmap := envMap()
 				keys := make([]string, len(kmap))
+
 				i := 0
 				for k := range kmap {
 					keys[i] = k
@@ -41,10 +42,10 @@ func (r *Root) env(cmd *cobra.Command, args []string) {
 	settings := envMap()
 	if len(args) == 0 {
 		for k, v := range settings {
-			os.Stdout.WriteString(fmt.Sprintf("%s=\"%v\"\n", k, viper.Get(v)))
+			fmt.Fprintf(os.Stdout, "%s=\"%v\"\n", k, viper.Get(v))
 		}
 	} else {
-		os.Stdout.WriteString(fmt.Sprintf("%s=\"%v\"\n", args[0], viper.Get(settings[args[0]])))
+		fmt.Fprintf(os.Stdout, "%s=\"%v\"\n", args[0], viper.Get(settings[args[0]]))
 	}
 }
 

@@ -10,6 +10,10 @@ import (
 	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/actions"
 )
 
+// logLevelDebug is the name used for the debug log level, both as a valid
+// value for the "log-level" flag and as its no-arg default.
+const logLevelDebug = "debug"
+
 func (r *Root) initializeCommonFlags() {
 	r.Command.Flags().StringVar(&r.configFile, "config", r.configFile, "config file (default is $HOME/.yot)")
 
@@ -23,7 +27,7 @@ func (r *Root) initializeCommonFlags() {
 		logging.WARNING:  {"warning", "warn", "w"},
 		logging.NOTICE:   {"notice", "note", "n"},
 		logging.INFO:     {"info", "i"},
-		logging.DEBUG:    {"debug", "d", "verbose", "v"},
+		logging.DEBUG:    {logLevelDebug, "d", "verbose", "v"},
 	}
 
 	r.Command.Flags().VarP(
@@ -33,7 +37,7 @@ func (r *Root) initializeCommonFlags() {
 		helpLogLevel,
 	)
 
-	r.Command.Flags().Lookup("log-level").NoOptDefVal = "debug"
+	r.Command.Flags().Lookup("log-level").NoOptDefVal = logLevelDebug
 
 	if err := viper.BindPFlag("logLevel", r.Command.Flags().Lookup("log-level")); err != nil {
 		r.Log.Fatal(err)

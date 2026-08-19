@@ -9,14 +9,22 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// Names of the shells supported by the completion command.
+const (
+	ShellBash       = "bash"
+	ShellZsh        = "zsh"
+	ShellFish       = "fish"
+	ShellPowerShell = "powershell"
+)
+
 func (r *Root) CompletionCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:                   completionUse,
 		Short:                 completionShort,
 		Long:                  completionLong,
 		DisableFlagsInUseLine: true,
-		ValidArgs:             []string{"bash", "zsh", "fish", "powershell"},
-		Args:                  cobra.ExactValidArgs(1),
+		ValidArgs:             []string{ShellBash, ShellZsh, ShellFish, ShellPowerShell},
+		Args:                  cobra.MatchAll(cobra.ExactArgs(1), cobra.OnlyValidArgs),
 		Run:                   r.Completions,
 	}
 }
@@ -27,19 +35,19 @@ func (r *Root) Completions(cmd *cobra.Command, args []string) {
 	}
 
 	switch args[0] {
-	case "bash":
+	case ShellBash:
 		if err := cmd.Root().GenBashCompletion(os.Stdout); err != nil {
 			r.Log.Fatal(err)
 		}
-	case "zsh":
+	case ShellZsh:
 		if err := cmd.Root().GenZshCompletion(os.Stdout); err != nil {
 			r.Log.Fatal(err)
 		}
-	case "fish":
+	case ShellFish:
 		if err := cmd.Root().GenFishCompletion(os.Stdout, true); err != nil {
 			r.Log.Fatal(err)
 		}
-	case "powershell":
+	case ShellPowerShell:
 		if err := cmd.Root().GenPowerShellCompletionWithDesc(os.Stdout); err != nil {
 			r.Log.Fatal(err)
 		}

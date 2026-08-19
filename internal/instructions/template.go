@@ -18,7 +18,7 @@ func renderInstructionsTemplate(fileName string, values interface{}) (io.Reader,
 		return nil, fmt.Errorf("unable to process template for instructions file %s, %w", fileName, err)
 	}
 
-	tpl = tpl.Funcs(template.FuncMap(sprig.FuncMap())).Option("missingkey=zero")
+	tpl = tpl.Funcs(sprig.FuncMap()).Option("missingkey=zero")
 
 	var b bytes.Buffer
 

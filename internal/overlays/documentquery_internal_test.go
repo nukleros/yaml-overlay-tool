@@ -55,6 +55,11 @@ spec:
 func TestDocumentQueries_checkQueries(t *testing.T) {
 	t.Parallel()
 
+	const (
+		queryStringKind = "kind"
+		tagStr          = "!!str"
+	)
+
 	tests := []struct {
 		name string
 		dq   DocumentQueries
@@ -67,18 +72,18 @@ func TestDocumentQueries_checkQueries(t *testing.T) {
 					Conditions: []*Condition{
 						{
 							Query: func() Queries {
-								q, _ := yamlpath.NewPath("kind")
+								q, _ := yamlpath.NewPath(queryStringKind)
 
 								return Queries{
 									Query{
 										yamlPath:    q,
-										queryString: "kind",
+										queryString: queryStringKind,
 									},
 								}
 							}(),
 							Value: yaml.Node{
 								Kind:  yaml.ScalarNode,
-								Tag:   "!!str",
+								Tag:   tagStr,
 								Value: `Service`,
 							},
 						},
@@ -99,18 +104,18 @@ func TestDocumentQueries_checkQueries(t *testing.T) {
 					Conditions: []*Condition{
 						{
 							Query: func() Queries {
-								q, _ := yamlpath.NewPath("kind")
+								q, _ := yamlpath.NewPath(queryStringKind)
 
 								return Queries{
 									Query{
 										yamlPath:    q,
-										queryString: "kind",
+										queryString: queryStringKind,
 									},
 								}
 							}(),
 							Value: yaml.Node{
 								Kind:  yaml.ScalarNode,
-								Tag:   "!!str",
+								Tag:   tagStr,
 								Value: `Potato`,
 							},
 						},
@@ -125,6 +130,7 @@ func TestDocumentQueries_checkQueries(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			y := testInit()
 
 			got := tt.dq.checkQueries(y)

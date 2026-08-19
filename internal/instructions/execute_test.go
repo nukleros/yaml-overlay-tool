@@ -13,6 +13,8 @@ import (
 func TestExecute(t *testing.T) {
 	t.Parallel()
 
+	const testOutputDir = "output/"
+
 	type args struct {
 		cfg *instructions.Config
 	}
@@ -27,7 +29,7 @@ func TestExecute(t *testing.T) {
 			args: args{
 				cfg: &instructions.Config{
 					InstructionsFile: "testdata/instructions.yaml",
-					OutputDir:        "output/",
+					OutputDir:        testOutputDir,
 					Indent:           2,
 				},
 			},
@@ -38,7 +40,7 @@ func TestExecute(t *testing.T) {
 			args: args{
 				cfg: &instructions.Config{
 					InstructionsFile: "testdata/testInstructions.yaml",
-					OutputDir:        "output/",
+					OutputDir:        testOutputDir,
 					Indent:           2,
 				},
 			},
@@ -51,6 +53,7 @@ func TestExecute(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			viper.Set("outputDirectory", "./output")
+
 			if err := instructions.Execute(tt.args.cfg); (err != nil) != tt.wantErr {
 				t.Errorf("Execute(%v) error = %v, wantErr %v", tt.args.cfg, err, tt.wantErr)
 			}

@@ -30,15 +30,37 @@ const (
 	NormalStyle
 )
 
+// Canonical style names and short aliases, shared between String(), FlagMap(),
+// and GetStyleFromConfig() so they can't drift out of sync with each other.
+const (
+	styleNormal       = "normal"
+	styleTagged       = "tagged"
+	styleDoubleQuoted = "doubleQuoted"
+	styleSingleQuoted = "singleQuoted"
+	styleLiteral      = "literal"
+	styleFolded       = "folded"
+	styleFlow         = "flow"
+
+	styleAliasTag    = "tag"
+	styleAliasDouble = "double"
+	styleAliasSingle = "single"
+	styleAliasFolded = "fo"
+	styleAliasFlow   = "fl"
+
+	styleAliasDoubleQuoted = "dq"
+	styleAliasSingleQuoted = "sq"
+	styleAliasFold         = "fold"
+)
+
 func (s Style) String() string {
 	toString := map[Style]string{
-		NormalStyle:       "normal",
-		TaggedStyle:       "tagged",
-		DoubleQuotedStyle: "doubleQuoted",
-		SingleQuotedStyle: "singleQuoted",
-		LiteralStyle:      "literal",
-		FoldedStyle:       "folded",
-		FlowStyle:         "flow",
+		NormalStyle:       styleNormal,
+		TaggedStyle:       styleTagged,
+		DoubleQuotedStyle: styleDoubleQuoted,
+		SingleQuotedStyle: styleSingleQuoted,
+		LiteralStyle:      styleLiteral,
+		FoldedStyle:       styleFolded,
+		FlowStyle:         styleFlow,
 	}
 
 	return toString[s]
@@ -46,13 +68,13 @@ func (s Style) String() string {
 
 func (ss Styles) FlagMap() map[Style][]string {
 	return map[Style][]string{
-		NormalStyle:       {"normal", "n"},
-		TaggedStyle:       {"tagged", "tag", "t"},
-		DoubleQuotedStyle: {"doubleQuoted", "doubleQuote", "double", "dq"},
-		SingleQuotedStyle: {"singleQuoted", "singleQoute", "single", "sq"},
-		LiteralStyle:      {"literal", "l"},
-		FoldedStyle:       {"folded", "fold", "fo"},
-		FlowStyle:         {"flow", "fl"},
+		NormalStyle:       {styleNormal, "n"},
+		TaggedStyle:       {styleTagged, styleAliasTag, "t"},
+		DoubleQuotedStyle: {styleDoubleQuoted, "doubleQuote", styleAliasDouble, styleAliasDoubleQuoted},
+		SingleQuotedStyle: {styleSingleQuoted, "singleQoute", styleAliasSingle, styleAliasSingleQuoted},
+		LiteralStyle:      {styleLiteral, "l"},
+		FoldedStyle:       {styleFolded, styleAliasFold, styleAliasFolded},
+		FlowStyle:         {styleFlow, styleAliasFlow},
 	}
 }
 
@@ -84,11 +106,11 @@ func setStyle(s Style, n ...*yaml.Node) {
 	for _, nv := range n {
 		switch nv.Kind {
 		case yaml.DocumentNode, yaml.MappingNode, yaml.SequenceNode, yaml.AliasNode:
-			nv.Style = yaml.Style(s)
+			nv.Style = yaml.Style(s) //nolint:gosec // s is a sum of at most 7 known power-of-two flags (max 127), well within uint32 range
 
 			setStyle(s, nv.Content...)
 		case yaml.ScalarNode:
-			newStyle := yaml.Style(s)
+			newStyle := yaml.Style(s) //nolint:gosec // s is a sum of at most 7 known power-of-two flags (max 127), well within uint32 range
 			// go-yaml v3 does not quote YAML 1.1-only boolean keywords (on/off/yes/no/y/n)
 			// when tag is !!str and style is 0; the encoder only auto-quotes YAML 1.2 keywords.
 			// Force double-quoting so the string type survives a round-trip.
@@ -109,19 +131,19 @@ func GetStyleFromConfig(v ...string) Styles {
 		ssp := strings.Split(strings.Trim(strings.ToLower(ss), "[]"), ",")
 		for _, s := range ssp {
 			switch s {
-			case "normal", "n":
+			case styleNormal, "n":
 				result = append(result, NormalStyle)
-			case "tagged", "tag", "t":
+			case styleTagged, styleAliasTag, "t":
 				result = append(result, TaggedStyle)
-			case "doublequoted", "doublequote", "double", "dq":
+			case "doublequoted", "doublequote", styleAliasDouble, styleAliasDoubleQuoted:
 				result = append(result, DoubleQuotedStyle)
-			case "singlequoted", "singlequote", "single", "sq":
+			case "singlequoted", "singlequote", styleAliasSingle, styleAliasSingleQuoted:
 				result = append(result, SingleQuotedStyle)
-			case "literal", "l":
+			case styleLiteral, "l":
 				result = append(result, LiteralStyle)
-			case "folded", "fold", "fo":
+			case styleFolded, styleAliasFold, styleAliasFolded:
 				result = append(result, FoldedStyle)
-			case "flow", "fl":
+			case styleFlow, styleAliasFlow:
 				result = append(result, FlowStyle)
 			}
 		}

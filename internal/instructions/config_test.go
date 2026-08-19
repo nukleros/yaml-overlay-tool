@@ -41,6 +41,8 @@ func buildDocNode(t *testing.T, src string) *yaml.Node {
 // a ServiceAccount, combined with a separate RBAC file (ClusterRole + ClusterRoleBinding)
 // targeting the same output path.
 func TestDocumentSeparators(t *testing.T) {
+	t.Parallel()
+
 	outputFile := filepath.Join(t.TempDir(), "combined.yaml")
 
 	// Simulate ns-and-sa.yaml after a delete overlay removes the Namespace document.
@@ -70,16 +72,19 @@ subjects: []`)
 
 	// OutputPath is absolute, so openOutputFile does not consult viper for the directory.
 	pChan := make(chan *instructions.YamlFile, 2)
+
 	pChan <- &instructions.YamlFile{
 		Path:       "ns-and-sa.yaml",
 		OutputPath: outputFile,
 		Nodes:      []*yaml.Node{emptyDoc, saDoc},
 	}
+
 	pChan <- &instructions.YamlFile{
 		Path:       "rbac.yaml",
 		OutputPath: outputFile,
 		Nodes:      []*yaml.Node{crDoc, crbDoc},
 	}
+
 	close(pChan)
 
 	if err := instructions.PostProcessHandler(&instructions.Config{}, pChan); err != nil {
@@ -91,13 +96,13 @@ subjects: []`)
 		t.Fatalf("read output file: %v", err)
 	}
 
-	// Bug 1: the first real document (SA) must have a leading "---\n" even though
+	// Case 1: the first real document (SA) must have a leading "---\n" even though
 	// it was preceded by an empty node that was skipped.
 	if !bytes.HasPrefix(content, []byte("---\n")) {
 		t.Errorf("output does not start with '---\\n':\n%s", content)
 	}
 
-	// Bug 2: all three documents (SA + CR + CRB) must be present -- not just
+	// Case 2: all three documents (SA + CR + CRB) must be present -- not just
 	// whichever YamlFile happened to write last.
 	dec := yaml.NewDecoder(bytes.NewReader(content))
 

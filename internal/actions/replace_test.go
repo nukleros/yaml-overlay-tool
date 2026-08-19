@@ -7,6 +7,8 @@ package actions_test
 
 import (
 	"testing"
+
+	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/actions"
 )
 
 func TestReplaceNode(t *testing.T) {
@@ -16,7 +18,7 @@ func TestReplaceNode(t *testing.T) {
 		{
 			name: "Replace Scalar Node (string)",
 			args: args{
-				query: "metadata.labels['app.kubernetes.io/name']",
+				query: queryMetadataLabelsAppName,
 				value: "rpk-dns",
 			},
 			expectedValue: `apiVersion: v1
@@ -52,7 +54,7 @@ spec:
 		{
 			name: "Replace value in array (replace integer with string)",
 			args: args{
-				query: "spec.ports[1].port",
+				query: querySpecPortsSecondPort,
 				value: "953",
 			},
 			expectedValue: `apiVersion: v1
@@ -88,7 +90,7 @@ spec:
 		{
 			name: "Replace entire array",
 			args: args{
-				query: "spec.ports",
+				query: querySpecPorts,
 				value: `- name: fake-data
   port: 9999
   protocol: TCP
@@ -131,5 +133,5 @@ spec:
 		},
 	}
 
-	tests.runTests(t, "replace")
+	tests.runTests(t, actions.ReplaceName)
 }

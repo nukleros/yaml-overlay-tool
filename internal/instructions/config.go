@@ -56,6 +56,7 @@ func (cfg *Config) doPostProcessing(yf *YamlFile, writtenPaths map[string]bool) 
 		o = os.Stdout
 	} else {
 		log.Debugf("Final: >>>\n%s\n", output)
+
 		o, err = cfg.openOutputFile(yf, writtenPaths)
 		if err != nil {
 			return err
@@ -137,6 +138,7 @@ func (cfg *Config) encodeNodes(nodes []*yaml.Node) (*bytes.Buffer, error) {
 
 		if !firstDocWritten {
 			output.WriteString("---\n")
+
 			firstDocWritten = true
 		}
 

@@ -14,24 +14,12 @@ import (
 // encodeNode is a helper that encodes a yaml.Node to a string.
 func encodeNode(n *yaml.Node) string {
 	var buf strings.Builder
+
 	enc := yaml.NewEncoder(&buf)
 	_ = enc.Encode(n)
 	_ = enc.Close()
 
 	return strings.TrimSpace(strings.TrimPrefix(buf.String(), "---"))
-}
-
-// parseScalar parses a single "key: value" YAML string and returns the value node.
-func parseScalar(t *testing.T, input string) *yaml.Node {
-	t.Helper()
-
-	var doc yaml.Node
-	if err := yaml.Unmarshal([]byte(input), &doc); err != nil {
-		t.Fatalf("failed to parse %q: %v", input, err)
-	}
-
-	// doc -> MappingNode -> [key, value]; return the value node
-	return doc.Content[0].Content[1]
 }
 
 // TestSetStylePreservesYAML11BoolStrings verifies that SetStyle does not cause
@@ -42,24 +30,32 @@ func parseScalar(t *testing.T, input string) *yaml.Node {
 func TestSetStylePreservesYAML11BoolStrings(t *testing.T) {
 	t.Parallel()
 
+	const (
+		wantOn  = `"on"`
+		wantOff = `"off"`
+		wantYes = `"yes"`
+		wantNo  = `"no"`
+		wantKey = "key"
+	)
+
 	cases := []struct {
-		input    string
-		wantKey  string
-		wantVal  string
+		input   string
+		wantKey string
+		wantVal string
 	}{
-		{`key: "on"`, "key", `"on"`},
-		{`key: "off"`, "key", `"off"`},
-		{`key: "yes"`, "key", `"yes"`},
-		{`key: "no"`, "key", `"no"`},
-		{`key: "y"`, "key", `"y"`},
-		{`key: "n"`, "key", `"n"`},
-		{`key: !!str on`, "key", `"on"`},
-		{`key: !!str off`, "key", `"off"`},
-		{`key: !!str yes`, "key", `"yes"`},
-		{`key: !!str no`, "key", `"no"`},
+		{`key: "on"`, wantKey, wantOn},
+		{`key: "off"`, wantKey, wantOff},
+		{`key: "yes"`, wantKey, wantYes},
+		{`key: "no"`, wantKey, wantNo},
+		{`key: "y"`, wantKey, `"y"`},
+		{`key: "n"`, wantKey, `"n"`},
+		{`key: !!str on`, wantKey, wantOn},
+		{`key: !!str off`, wantKey, wantOff},
+		{`key: !!str yes`, wantKey, wantYes},
+		{`key: !!str no`, wantKey, wantNo},
 		// YAML 1.2 booleans: go-yaml already handles these; verify no regression.
-		{`key: "true"`, "key", `"true"`},
-		{`key: "false"`, "key", `"false"`},
+		{`key: "true"`, wantKey, `"true"`},
+		{`key: "false"`, wantKey, `"false"`},
 	}
 
 	stylesToTest := []struct {

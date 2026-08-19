@@ -21,22 +21,22 @@ func TestAction_String(t *testing.T) {
 		{
 			name: "Test Merge String",
 			a:    actions.Merge,
-			want: "merge",
+			want: actions.MergeName,
 		},
 		{
 			name: "Test Delete String",
 			a:    actions.Delete,
-			want: "delete",
+			want: actions.DeleteName,
 		},
 		{
 			name: "Test Replace String",
 			a:    actions.Replace,
-			want: "replace",
+			want: actions.ReplaceName,
 		},
 		{
 			name: "test Combine String",
 			a:    actions.Combine,
-			want: "combine",
+			want: actions.CombineName,
 		},
 		{
 			name: "Test invalid String",
@@ -75,7 +75,7 @@ func TestAction_UnmarshalYAML(t *testing.T) {
 			args: args{
 				value: &yaml.Node{
 					Kind:  yaml.ScalarNode,
-					Value: "merge",
+					Value: actions.MergeName,
 				},
 			},
 			wantErr: false,
@@ -86,7 +86,7 @@ func TestAction_UnmarshalYAML(t *testing.T) {
 			args: args{
 				value: &yaml.Node{
 					Kind:  yaml.ScalarNode,
-					Value: "replace",
+					Value: actions.ReplaceName,
 				},
 			},
 			wantErr: false,
@@ -97,7 +97,7 @@ func TestAction_UnmarshalYAML(t *testing.T) {
 			args: args{
 				value: &yaml.Node{
 					Kind:  yaml.ScalarNode,
-					Value: "delete",
+					Value: actions.DeleteName,
 				},
 			},
 			wantErr: false,
@@ -108,7 +108,7 @@ func TestAction_UnmarshalYAML(t *testing.T) {
 			args: args{
 				value: &yaml.Node{
 					Kind:  yaml.ScalarNode,
-					Value: "combine",
+					Value: actions.CombineName,
 				},
 			},
 			wantErr: false,

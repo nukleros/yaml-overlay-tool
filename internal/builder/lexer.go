@@ -174,11 +174,7 @@ func (l *lexer) consumedWhitespaced(tokens ...string) bool {
 func (l *lexer) consumeWhitespace() {
 	pos := l.pos
 
-	for {
-		if pos >= len(l.input) {
-			break
-		}
-
+	for pos < len(l.input) {
 		r, width := utf8.DecodeRuneInString(l.input[pos:])
 		if !unicode.IsSpace(r) {
 			break

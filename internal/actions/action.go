@@ -32,13 +32,21 @@ const (
 	Combine
 )
 
+// Names of the overlay actions as they appear in YAML and on the CLI.
+const (
+	MergeName   = "merge"
+	ReplaceName = "replace"
+	DeleteName  = "delete"
+	CombineName = "combine"
+)
+
 func (a Action) String() string {
 	toString := map[Action]string{
 		Invalid: "",
-		Merge:   "merge",
-		Replace: "replace",
-		Delete:  "delete",
-		Combine: "combine",
+		Merge:   MergeName,
+		Replace: ReplaceName,
+		Delete:  DeleteName,
+		Combine: CombineName,
 	}
 
 	return toString[a]
@@ -54,11 +62,11 @@ func (a *Action) UnmarshalYAML(value *yaml.Node) error {
 	y = strings.ToLower(y)
 
 	toID := map[string]Action{
-		"":        Invalid,
-		"merge":   Merge,
-		"replace": Replace,
-		"delete":  Delete,
-		"combine": Combine,
+		"":          Invalid,
+		MergeName:   Merge,
+		ReplaceName: Replace,
+		DeleteName:  Delete,
+		CombineName: Combine,
 	}
 
 	if toID[y] == Invalid {
@@ -97,11 +105,18 @@ const (
 	Inject
 )
 
+// Names of the onMissing actions as they appear in YAML and on the CLI.
+const (
+	DefaultName = "default"
+	IgnoreName  = "ignore"
+	InjectName  = "inject"
+)
+
 func (a OnMissingAction) String() string {
 	toString := map[OnMissingAction]string{
-		Default: "default",
-		Ignore:  "ignore",
-		Inject:  "inject",
+		Default: DefaultName,
+		Ignore:  IgnoreName,
+		Inject:  InjectName,
 	}
 
 	return toString[a]
@@ -117,9 +132,9 @@ func (a *OnMissingAction) UnmarshalYAML(value *yaml.Node) error {
 	y = strings.ToLower(y)
 
 	toID := map[string]OnMissingAction{
-		"default": Default,
-		"ignore":  Ignore,
-		"inject":  Inject,
+		DefaultName: Default,
+		IgnoreName:  Ignore,
+		InjectName:  Inject,
 	}
 
 	*a = toID[y]

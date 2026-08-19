@@ -34,7 +34,9 @@ type Config struct {
 }
 
 // doPostProcessing renders a document and outputs it to the location specified in config.
-func (cfg *Config) doPostProcessing(yf *YamlFile) error {
+// writtenPaths tracks which output files have already been written in this run so that
+// subsequent YamlFiles targeting the same path are appended rather than overwritten.
+func (cfg *Config) doPostProcessing(yf *YamlFile, writtenPaths map[string]bool) error {
 	var o *os.File
 
 	var err error
@@ -54,7 +56,8 @@ func (cfg *Config) doPostProcessing(yf *YamlFile) error {
 		o = os.Stdout
 	} else {
 		log.Debugf("Final: >>>\n%s\n", output)
-		o, err = cfg.openOutputFile(yf)
+
+		o, err = cfg.openOutputFile(yf, writtenPaths)
 		if err != nil {
 			return err
 		}
@@ -72,7 +75,9 @@ func (cfg *Config) doPostProcessing(yf *YamlFile) error {
 }
 
 // openOutputFile opens or creates a file for outputing results.
-func (cfg *Config) openOutputFile(yf *YamlFile) (*os.File, error) {
+// The first write to a given path truncates (fresh start); subsequent writes in the same run
+// append so that multiple YamlFiles sharing one outputPath are all preserved.
+func (cfg *Config) openOutputFile(yf *YamlFile, writtenPaths map[string]bool) (*os.File, error) {
 	defaultDirMode := 0755
 	defaultFileMode := 0644
 
@@ -89,7 +94,14 @@ func (cfg *Config) openOutputFile(yf *YamlFile) (*os.File, error) {
 		}
 	}
 
-	file, err := os.OpenFile(fileName, os.O_CREATE|os.O_RDWR|os.O_TRUNC, fs.FileMode(defaultFileMode))
+	flags := os.O_CREATE | os.O_RDWR | os.O_TRUNC
+	if writtenPaths[fileName] {
+		flags = os.O_CREATE | os.O_RDWR | os.O_APPEND
+	}
+
+	writtenPaths[fileName] = true
+
+	file, err := os.OpenFile(fileName, flags, fs.FileMode(defaultFileMode))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create/open file %s: %w", fileName, err)
 	}
@@ -117,17 +129,23 @@ func (cfg *Config) encodeNodes(nodes []*yaml.Node) (*bytes.Buffer, error) {
 
 	ye.SetIndent(viper.GetInt("indentLevel"))
 
-	for i, node := range nodes {
+	var firstDocWritten bool
+
+	for _, node := range nodes {
 		if len(node.Content) == 0 {
 			continue
 		}
 
-		if i == 0 {
+		if !firstDocWritten {
 			output.WriteString("---\n")
+
+			firstDocWritten = true
 		}
 
 		style := actions.GetStyleFromConfig(viper.GetStringSlice("outputStyle")...)
-		actions.SetStyle(style, node)
+		if len(style) > 0 {
+			actions.SetStyle(style, node)
+		}
 
 		err := ye.Encode(node)
 		if err != nil {

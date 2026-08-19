@@ -16,6 +16,15 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// JSONPath queries shared across multiple action test tables (merge, replace,
+// combine, delete) in this package.
+const (
+	queryKind                  = "kind"
+	queryMetadataLabelsAppName = "metadata.labels['app.kubernetes.io/name']"
+	querySpecPorts             = "spec.ports"
+	querySpecPortsSecondPort   = "spec.ports[1].port"
+)
+
 type args struct {
 	query string
 	value string
@@ -89,6 +98,7 @@ func (tst testCases) runTests(t *testing.T, a string) {
 		testCase := tt
 		t.Run(testCase.name, func(t *testing.T) {
 			t.Parallel()
+
 			yp, _ := yamlpath.NewPath(testCase.args.query)
 			results, _ := yp.Find(testYaml)
 
@@ -116,19 +126,19 @@ func testAction(t *testing.T, action string, result, testYaml *yaml.Node, testVa
 	t.Helper()
 
 	switch action {
-	case "merge":
+	case actions.MergeName:
 		if err := actions.MergeNode(result, testValue[0]); err != nil {
 			return fmt.Errorf("encountered Error on merge action: %w", err)
 		}
-	case "replace":
+	case actions.ReplaceName:
 		if err := actions.ReplaceNode(result, testValue[0]); err != nil {
 			return fmt.Errorf("encountered Error on replace action: %w", err)
 		}
-	case "combine":
+	case actions.CombineName:
 		if err := actions.CombineNode(result, testValue[0]); err != nil {
 			return fmt.Errorf("encountered Error on format action: %w", err)
 		}
-	case "delete":
+	case actions.DeleteName:
 		actions.DeleteNode(testYaml, result)
 	}
 

@@ -38,15 +38,19 @@ func TestNew(t *testing.T) { //nolint:paralleltest
 			if got.Command.Use != test.want.Use {
 				t.Errorf("New() = %v, want %v", got.Command.Use, test.want.Use)
 			}
+
 			if got.Command.Short != test.want.Short {
 				t.Errorf("New() = %v, want %v", got.Command.Short, test.want.Short)
 			}
+
 			if got.Command.Long != test.want.Long {
 				t.Errorf("New() = %v, want %v", got.Command.Long, test.want.Long)
 			}
+
 			if got.Command.Version != test.want.Version {
 				t.Errorf("New() = %v, want %v", got.Command.Version, test.want.Version)
 			}
+
 			if reflect.DeepEqual(got.Execute, test.want.Execute) {
 				t.Errorf("New() = %v, want %v", got.Command.Version, test.want.Version)
 			}

@@ -232,7 +232,7 @@ func bracketChildNames(childNames string) []string {
 		children = append(children, name)
 	}
 
-	unquotedChildren := []string{}
+	unquotedChildren := make([]string, 0, len(children))
 
 	for _, c := range children {
 		c = strings.TrimSpace(c)

@@ -8,17 +8,17 @@ jobs:
     name: Go Lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v7
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v2
+        uses: golangci/golangci-lint-action@v9
         with:
-          version: latest
+          version: 'v2.12.2'
 
   yaml-lint:
     name: Yaml Lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v7
       - name: yaml lint
         uses: ibiqlik/action-yamllint@v3.0.0
 
@@ -26,9 +26,9 @@ jobs:
     name: Go Test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-go@v2
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
         with:
-          go-version: 1.16.x
+          go-version: '1.26'
       - name: go test
         run: go test ./...

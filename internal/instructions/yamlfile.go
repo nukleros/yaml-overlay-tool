@@ -128,6 +128,7 @@ func (yfs *YamlFiles) expandDirectories() error {
 			if path.Ext(y[i].OutputPath) != "" {
 				return fmt.Errorf("%w, provide a directory for outputPath instead", ErrFoundDirectoryWithPathOutput)
 			}
+
 			paths, err = getFileNames(y[i].Path)
 			if err != nil {
 				return err
@@ -166,6 +167,7 @@ func (yfs *YamlFiles) mergeDuplicates() {
 		} else {
 			search[ys[i].Path].Overlays = append(search[ys[i].Path].Overlays, ys[i].Overlays...)
 			search[ys[i].Path].Documents = append(search[ys[i].Path].Documents, ys[i].Documents...)
+
 			if ys[i].OutputPath != "" {
 				search[ys[i].Path].OutputPath = ys[i].OutputPath
 			}

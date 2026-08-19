@@ -7,7 +7,12 @@ package actions_test
 
 import (
 	"testing"
+
+	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/actions"
 )
+
+// queryMetadataLabels is used by several merge test cases in this file.
+const queryMetadataLabels = "metadata.labels"
 
 func TestMergeNode(t *testing.T) {
 	t.Parallel()
@@ -16,7 +21,7 @@ func TestMergeNode(t *testing.T) {
 		{
 			name: "Merge Sequence Node (array)",
 			args: args{
-				query: "spec.ports",
+				query: querySpecPorts,
 				value: "- name: sequenceTest\n  port: 22\n  protocol: TCP\n  targetPort: sshd",
 			},
 			expectedValue: `apiVersion: v1
@@ -56,7 +61,7 @@ spec:
 		{
 			name: "Merge map",
 			args: args{
-				query: "metadata.labels",
+				query: queryMetadataLabels,
 				value: "foo: bar\nbar: foo\npotato: badayda",
 			},
 			expectedValue: `apiVersion: v1
@@ -95,7 +100,7 @@ spec:
 		{
 			name: "Merge map (inject line comment)",
 			args: args{
-				query: "metadata.labels",
+				query: queryMetadataLabels,
 				value: "foo: bar\nbar: foo\npotato: badayda # sometimes encountered in the northeast",
 			},
 			expectedValue: `apiVersion: v1
@@ -134,7 +139,7 @@ spec:
 		{
 			name: "Merge map (with line comment)",
 			args: args{
-				query: "metadata.labels",
+				query: queryMetadataLabels,
 				value: `app.kubernetes.io/name: "%v" # test`,
 			},
 			expectedValue: `apiVersion: v1
@@ -170,7 +175,7 @@ spec:
 		{
 			name: "Format Scalar Node (only type accepted for format action)",
 			args: args{
-				query: "kind",
+				query: queryKind,
 				value: "My%v",
 			},
 			expectedValue: `apiVersion: v1
@@ -281,5 +286,5 @@ spec:
 `,
 		},
 	}
-	tests.runTests(t, "merge")
+	tests.runTests(t, actions.MergeName)
 }

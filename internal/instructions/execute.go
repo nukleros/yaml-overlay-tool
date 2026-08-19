@@ -73,8 +73,10 @@ func Execute(cfg *Config) error {
 // PostProcessHandler waits for YamlFile objects and preforms post overlay tasks like rendering,
 // saving to file or displaying to screen.
 func PostProcessHandler(cfg *Config, pChan <-chan *YamlFile) error {
+	writtenPaths := make(map[string]bool)
+
 	for yf := range pChan {
-		if err := cfg.doPostProcessing(yf); err != nil {
+		if err := cfg.doPostProcessing(yf, writtenPaths); err != nil {
 			return err
 		}
 	}

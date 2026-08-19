@@ -7,6 +7,8 @@ package actions_test
 
 import (
 	"testing"
+
+	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/actions"
 )
 
 func TestDeleteNode(t *testing.T) {
@@ -16,7 +18,7 @@ func TestDeleteNode(t *testing.T) {
 		{
 			name: "Delete Scalar Node",
 			args: args{
-				query: "kind",
+				query: queryKind,
 			},
 			expectedValue: `apiVersion: v1
 metadata:
@@ -111,5 +113,5 @@ spec:
 		},
 	}
 
-	tests.runTests(t, "delete")
+	tests.runTests(t, actions.DeleteName)
 }

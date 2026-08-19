@@ -12,6 +12,8 @@ import (
 func TestDocument_checkDocumentIndex(t *testing.T) {
 	t.Parallel()
 
+	const testDocumentName = "test 1"
+
 	type fields struct {
 		Name     string
 		Path     int
@@ -31,7 +33,7 @@ func TestDocument_checkDocumentIndex(t *testing.T) {
 		{
 			name: "different indexes should return false",
 			fields: fields{
-				Name:     "test 1",
+				Name:     testDocumentName,
 				Path:     0,
 				Overlays: nil,
 			},
@@ -43,7 +45,7 @@ func TestDocument_checkDocumentIndex(t *testing.T) {
 		{
 			name: "same indexes should return true",
 			fields: fields{
-				Name:     "test 1",
+				Name:     testDocumentName,
 				Path:     0,
 				Overlays: nil,
 			},

@@ -13,6 +13,12 @@ import (
 func Test_getValues(t *testing.T) {
 	t.Parallel()
 
+	const (
+		valuesDefaults  = "testdata/values/defaults.yaml"
+		valuesOnPremise = "testdata/values/on_premise.yml"
+		valuesSiteB     = "testdata/values/site_b.yml"
+	)
+
 	type args struct {
 		fileNames []string
 	}
@@ -27,8 +33,8 @@ func Test_getValues(t *testing.T) {
 			name: "test merging simple values",
 			args: args{
 				fileNames: []string{
-					"testdata/values/defaults.yaml",
-					"testdata/values/on_premise.yml",
+					valuesDefaults,
+					valuesOnPremise,
 				},
 			},
 			want: `foo: you
@@ -43,8 +49,8 @@ yoo: car
 			name: "test merge of several override values",
 			args: args{
 				fileNames: []string{
-					"testdata/values/defaults.yaml",
-					"testdata/values/site_b.yml",
+					valuesDefaults,
+					valuesSiteB,
 				},
 			},
 			want: `foo: foo
@@ -61,9 +67,9 @@ yoo: bar
 			name: "multi-file complex merge",
 			args: args{
 				fileNames: []string{
-					"testdata/values/defaults.yaml",
-					"testdata/values/on_premise.yml",
-					"testdata/values/site_b.yml",
+					valuesDefaults,
+					valuesOnPremise,
+					valuesSiteB,
 					"testdata/values/site_a.yaml",
 				},
 			},
@@ -94,12 +100,14 @@ zarf: oo
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
+
 			got, err := getValues(tt.args.fileNames)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("getValues(%v) error = %v, wantErr %v", tt.args.fileNames, err, tt.wantErr)
 
 				return
 			}
+
 			b, _ := yaml.Marshal(got)
 			if !reflect.DeepEqual(string(b), tt.want) {
 				t.Errorf("getValues(%v) = %v, want %v", tt.args.fileNames, string(b), tt.want)

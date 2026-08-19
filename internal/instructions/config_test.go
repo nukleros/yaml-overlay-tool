@@ -40,9 +40,11 @@ func buildDocNode(t *testing.T, src string) *yaml.Node {
 // a two-doc source file where the first doc is deleted (Namespace), leaving only
 // a ServiceAccount, combined with a separate RBAC file (ClusterRole + ClusterRoleBinding)
 // targeting the same output path.
-func TestDocumentSeparators(t *testing.T) {
-	t.Parallel()
-
+//
+// Does not call t.Parallel(): PostProcessHandler reads the global viper config
+// (encodeNodes reads "indentLevel"/"outputStyle"/"stdout"), which races with any
+// other test in this package that also touches viper. See TestExecute.
+func TestDocumentSeparators(t *testing.T) { //nolint:paralleltest // must not run concurrently; see comment above
 	outputFile := filepath.Join(t.TempDir(), "combined.yaml")
 
 	// Simulate ns-and-sa.yaml after a delete overlay removes the Namespace document.

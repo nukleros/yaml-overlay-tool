@@ -8,7 +8,7 @@
 <!-- code_chunk_output -->
 
 - [Manual install](#manual-install)
-  - [Download the latest binary](#download-the-latest-binaryhttpsgithubcomvmare-tanzu-labsyaml-overlay-toolreleaseslatest)
+  - [Download the latest binary](#download-the-latest-binaryhttpsgithubcomnuklerosyaml-overlay-toolreleaseslatest)
   - [wget](#wget)
 - [MacOS / Linux via Homebrew install](#macos-linux-via-homebrew-install)
 - [Linux snap install](#linux-snap-install)
@@ -22,13 +22,13 @@
 
 ## Manual install
 
-### [Download the latest binary](https://github.com/vmare-tanzu-labs/yaml-overlay-tool/releases/latest)
+### [Download the latest binary](https://github.com/nukleros/yaml-overlay-tool/releases/latest)
 
 ### wget
 Use wget to download the pre-compiled binaries:
 
 ```bash
-wget https://github.com/vmware-tanzu-labs/yaml-overlay-tool/releases/download/${VERSION}/${BINARY}.tar.gz -O - |\
+wget https://github.com/nukleros/yaml-overlay-tool/releases/download/${VERSION}/${BINARY}.tar.gz -O - |\
   tar xz && mv ${BINARY} /usr/bin/yot
 ```
 
@@ -39,7 +39,7 @@ For instance, VERSION=v0.3.1 and BINARY=yot_${VERSION}_linux_amd64
 Using [Homebrew](https://brew.sh/)  
 
 ```bash
-brew tap vmware-tanzu-labs/tap
+brew tap nukleros/tap
 brew install yot
 ```
 
@@ -71,27 +71,27 @@ sudo mv /etc/myfiletmp.yaml /etc/myfile.yaml
 ## Docker image pull
 
 ```bash
-docker pull ghcr.io/vmawre-tanzu-labs/yot
+docker pull ghcr.io/nukleros/yot
 ```
 
 ### One-shot container use
 
 ```bash
-docker run --rm -v "${PWD}":/workdir ghcr.io/vmware-tanzu-labs/yot [flags]
+docker run --rm -v "${PWD}":/workdir ghcr.io/nukleros/yot [flags]
 ```
 
 
 ### Run container commands interactively
 
 ```bash
-docker run --rm -it -v "${PWD}":/workdir --entrypoint sh ghcr.io/vmawre-tanzu-labs/yot
+docker run --rm -it -v "${PWD}":/workdir --entrypoint sh ghcr.io/nukleros/yot
 ```
 
 It can be useful to have a bash function to avoid typing the whole docker command:
 
 ```bash
 yot() {
-  docker run --rm -i -v "${PWD}":/workdir ghcr.io/vmware-tanzu-labs/yot "$@"
+  docker run --rm -i -v "${PWD}":/workdir ghcr.io/nukleros/yot "$@"
 }
 ```
 
@@ -99,7 +99,7 @@ yot() {
 ## Go install
 
 ```bash
-GO111MODULE=on go get github.com/vmware-tanzu-labs/yaml-overlay-tool/cmd/yot
+GO111MODULE=on go get github.com/nukleros/yaml-overlay-tool/cmd/yot
 ```
 
 

@@ -97,7 +97,7 @@ yamlFiles:  # what to overlay onto
         query: metadata.labels
         value:
           potato: "test"
-          app.kubernetes.io/owner: vmware-tanzu-labs
+          app.kubernetes.io/owner: nukleros
           app.kubernetes.io/purpose: dns
         action: merge
       - name: "Apply kapp change group annotations"

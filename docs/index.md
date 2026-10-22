@@ -1,4 +1,4 @@
-[Back to Project](https://github.com/vmware-tanzu-labs/yaml-overlay-tool)
+[Back to Project](https://github.com/nukleros/yaml-overlay-tool)
 
 
 # Introduction to YAML Overlay Tool
@@ -29,4 +29,4 @@ Each overlay operation is performed with a JSONPath `query`, a desired `value`, 
 1. [Interactive tutorials](sections/tutorials.md)
 
 
-[Back to Project](https://github.com/vmware-tanzu-labs/yaml-overlay-tool)
+[Back to Project](https://github.com/nukleros/yaml-overlay-tool)

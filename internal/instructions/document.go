@@ -3,7 +3,7 @@
 
 package instructions
 
-import "github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/overlays"
+import "github.com/nukleros/yaml-overlay-tool/internal/overlays"
 
 // Document is a set of overlays scoped to a specific document within a yamlfile.
 type Document struct {

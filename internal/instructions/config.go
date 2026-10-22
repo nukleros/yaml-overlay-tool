@@ -10,10 +10,10 @@ import (
 	"os"
 	"path"
 
+	"github.com/nukleros/yaml-overlay-tool/internal/actions"
+	"github.com/nukleros/yaml-overlay-tool/internal/overlays"
 	"github.com/op/go-logging"
 	"github.com/spf13/viper"
-	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/actions"
-	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/overlays"
 	"gopkg.in/yaml.v3"
 )
 

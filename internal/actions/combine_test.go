@@ -8,7 +8,7 @@ package actions_test
 import (
 	"testing"
 
-	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/actions"
+	"github.com/nukleros/yaml-overlay-tool/internal/actions"
 )
 
 const (
@@ -24,7 +24,7 @@ const expectedUnchangedBoolTest = `apiVersion: v1
 kind: Service
 metadata:
   name: bind-udp
-  namespace: tanzu-dns
+  namespace: nukleros-dns
   labels:
     app.kubernetes.io/name: external-dns
   annotations:
@@ -64,7 +64,7 @@ func TestCombineNode(t *testing.T) {
 kind: Service
 metadata:
   name: bind-udp
-  namespace: tanzu-dns
+  namespace: nukleros-dns
   labels:
     app.kubernetes.io/name: external-dnses
   annotations:
@@ -100,7 +100,7 @@ spec:
 kind: Service
 metadata:
   name: bind-udp
-  namespace: tanzu-dns
+  namespace: nukleros-dns
   labels:
     app.kubernetes.io/name: external-dns
   annotations:
@@ -160,7 +160,7 @@ spec:
 kind: Service
 metadata:
   name: bind-udp
-  namespace: tanzu-dns
+  namespace: nukleros-dns
   labels:
     app.kubernetes.io/name: external-dns
   annotations:
@@ -196,7 +196,7 @@ spec:
 kind: Service
 metadata:
   name: bind-udp
-  namespace: tanzu-dns
+  namespace: nukleros-dns
   labels:
     app.kubernetes.io/name: external-dns
   annotations:

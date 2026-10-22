@@ -8,7 +8,7 @@ package actions_test
 import (
 	"testing"
 
-	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/actions"
+	"github.com/nukleros/yaml-overlay-tool/internal/actions"
 )
 
 // queryMetadataLabels is used by several merge test cases in this file.
@@ -28,7 +28,7 @@ func TestMergeNode(t *testing.T) {
 kind: Service
 metadata:
   name: bind-udp
-  namespace: tanzu-dns
+  namespace: nukleros-dns
   labels:
     app.kubernetes.io/name: external-dns
   annotations:
@@ -68,7 +68,7 @@ spec:
 kind: Service
 metadata:
   name: bind-udp
-  namespace: tanzu-dns
+  namespace: nukleros-dns
   labels:
     app.kubernetes.io/name: external-dns
     foo: bar
@@ -107,7 +107,7 @@ spec:
 kind: Service
 metadata:
   name: bind-udp
-  namespace: tanzu-dns
+  namespace: nukleros-dns
   labels:
     app.kubernetes.io/name: external-dns
     foo: bar
@@ -146,7 +146,7 @@ spec:
 kind: Service
 metadata:
   name: bind-udp
-  namespace: tanzu-dns
+  namespace: nukleros-dns
   labels:
     app.kubernetes.io/name: external-dns # test
   annotations:
@@ -182,7 +182,7 @@ spec:
 kind: MyService
 metadata:
   name: bind-udp
-  namespace: tanzu-dns
+  namespace: nukleros-dns
   labels:
     app.kubernetes.io/name: external-dns
   annotations:
@@ -218,7 +218,7 @@ spec:
 kind: Service
 metadata:
   name: bind-udp
-  namespace: tanzu-dns
+  namespace: nukleros-dns
   labels:
     app.kubernetes.io/name: external-dns
   annotations:
@@ -256,7 +256,7 @@ spec:
 kind: Service
 metadata:
   name: bind-udp
-  namespace: tanzu-dns
+  namespace: nukleros-dns
   labels:
     app.kubernetes.io/name: external-dns
   annotations:

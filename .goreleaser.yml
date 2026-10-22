@@ -14,7 +14,7 @@ builds:
     main: ./cmd/yot
     binary: yot
     ldflags:
-      - -s -w -X github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/commands.version={{.Version}} -extldflags '-static'
+      - -s -w -X github.com/nukleros/yaml-overlay-tool/internal/commands.version={{.Version}} -extldflags '-static'
 
 signs:
   - artifacts: checksum
@@ -58,8 +58,8 @@ changelog:
 project_name: yot
 dockers:
   - image_templates:
-      - 'ghcr.io/vmware-tanzu-labs/yot:v{{ .Version }}'
-      - 'ghcr.io/vmware-tanzu-labs/yot:latest'
+      - 'ghcr.io/nukleros/yot:v{{ .Version }}'
+      - 'ghcr.io/nukleros/yot:latest'
     dockerfile: Dockerfile
     build_flag_templates:
       - "--label=org.opencontainers.image.created={{.Date}}"
@@ -74,7 +74,7 @@ brews:
   - name: yot
 
     tap:
-      owner: vmware-tanzu-labs
+      owner: nukleros
       name: homebrew-tap
       token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
 
@@ -82,7 +82,7 @@ brews:
     # Defaults are shown.
     commit_author:
       name: goreleaserbot
-      email: goreleaser@vmware-tanzu-labs.com
+      email: goreleaser@nukleros.com
 
     # Folder inside the repository to put the formula.
     # Default is the root folder.
@@ -90,7 +90,7 @@ brews:
 
     # Your app's homepage.
     # Default is empty.
-    homepage: "https://github.com/vmware-tanzu-labs/yaml-overlay-tool"
+    homepage: "https://github.com/nukleros/yaml-overlay-tool"
 
     # Template of your app's description.
     # Default is empty.
@@ -125,11 +125,11 @@ brews:
       system "#{bin}/yot --version"
 nfpms:
   - file_name_template: '{{ .ProjectName }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
-    homepage:  https://github.com/vmware-tanzu-labs/yaml-overlay-tool.com
+    homepage:  https://github.com/nukleros/yaml-overlay-tool.com
     description: "A YAML Overlay Tool with templating tendencies."
     maintainer: Jeff Davis <jeffda@vmware.com>, Andrew Huffman <ahuffman@vmware.com>
     license: MIT
-    vendor: VMware Tanzu Labs
+    vendor: Nukleros
     contents:
       - src: ./completions/yot.bash
         dst: /etc/bash_completion.d/yot

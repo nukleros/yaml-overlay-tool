@@ -6,7 +6,7 @@ package instructions
 import (
 	"testing"
 
-	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/overlays"
+	"github.com/nukleros/yaml-overlay-tool/internal/overlays"
 )
 
 func TestDocument_checkDocumentIndex(t *testing.T) {

@@ -4,7 +4,7 @@
 package main
 
 import (
-	command "github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/commands"
+	command "github.com/nukleros/yaml-overlay-tool/internal/commands"
 )
 
 func main() {

@@ -8,7 +8,7 @@ package actions_test
 import (
 	"testing"
 
-	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/actions"
+	"github.com/nukleros/yaml-overlay-tool/internal/actions"
 )
 
 func TestDeleteNode(t *testing.T) {
@@ -23,7 +23,7 @@ func TestDeleteNode(t *testing.T) {
 			expectedValue: `apiVersion: v1
 metadata:
   name: bind-udp
-  namespace: tanzu-dns
+  namespace: nukleros-dns
   labels:
     app.kubernetes.io/name: external-dns
   annotations:
@@ -58,7 +58,7 @@ spec:
 kind: Service
 metadata:
   name: bind-udp
-  namespace: tanzu-dns
+  namespace: nukleros-dns
   labels:
     app.kubernetes.io/name: external-dns
 spec:
@@ -89,7 +89,7 @@ spec:
 kind: Service
 metadata:
   name: bind-udp
-  namespace: tanzu-dns
+  namespace: nukleros-dns
   labels:
     app.kubernetes.io/name: external-dns
   annotations:

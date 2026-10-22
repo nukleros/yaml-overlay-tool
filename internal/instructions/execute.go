@@ -7,8 +7,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/nukleros/yaml-overlay-tool/internal/overlays"
 	"github.com/op/go-logging"
-	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/overlays"
 	"golang.org/x/sync/errgroup"
 )
 

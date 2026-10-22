@@ -6,8 +6,8 @@ package instructions_test
 import (
 	"testing"
 
+	"github.com/nukleros/yaml-overlay-tool/internal/instructions"
 	"github.com/spf13/viper"
-	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/instructions"
 )
 
 // TestExecute does not call t.Parallel(): Execute() reads and writes the global

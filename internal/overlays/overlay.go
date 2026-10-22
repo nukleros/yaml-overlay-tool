@@ -6,8 +6,8 @@ package overlays
 import (
 	"fmt"
 
+	"github.com/nukleros/yaml-overlay-tool/internal/actions"
 	"github.com/op/go-logging"
-	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/actions"
 	"gopkg.in/yaml.v3"
 )
 

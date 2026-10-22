@@ -11,7 +11,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/vmware-tanzu-labs/yaml-overlay-tool/internal/instructions"
+	"github.com/nukleros/yaml-overlay-tool/internal/instructions"
 	"gopkg.in/yaml.v3"
 )
 

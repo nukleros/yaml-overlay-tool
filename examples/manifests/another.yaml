@@ -8,7 +8,7 @@ metadata:
     gatekeeper.sh/operation: audit
     gatekeeper.sh/system: "yes"
   name: gatekeeper-audit
-  namespace: tanzu-admission
+  namespace: nukleros-admission
 spec:
   replicas: 1
   selector:
@@ -90,7 +90,7 @@ metadata:
     gatekeeper.sh/operation: webhook
     gatekeeper.sh/system: "yes"
   name: gatekeeper-controller-manager
-  namespace: tanzu-admission
+  namespace: nukleros-admission
 spec:
   replicas: 1
   selector:
@@ -113,7 +113,7 @@ spec:
         - args:
             - --port=8443
             - --logtostderr
-            - --exempt-namespace=tanzu-admission
+            - --exempt-namespace=nukleros-admission
             - --operation=webhook
             - --disable-cert-rotation
           command:
@@ -185,7 +185,7 @@ metadata:
     app.kubernetes.io/name: gatekeeper
     gatekeeper.sh/system: "yes"
   name: gatekeeper-webhook-service
-  namespace: tanzu-admission
+  namespace: nukleros-admission
 spec:
   ports:
     - port: 443

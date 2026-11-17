@@ -26,7 +26,10 @@ type Root struct {
 	Command    *cobra.Command
 }
 
-// New builds the yot root command with its flags and subcommands.
+// New builds the yot root command with its flags and subcommands. Because it adds an
+// initializer with cobra.OnInitialize and binds flags to the global viper instance, call
+// it once per process, and never from parallel tests, where concurrent calls race on
+// viper's internal maps.
 func New() *Root {
 	root := &Root{
 		Log: logging.MustGetLogger("cmd"),

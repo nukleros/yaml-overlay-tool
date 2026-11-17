@@ -34,6 +34,20 @@ Processing begins at the instruction's `commonOverlays` if they exist in the ins
 
 If no `commonOverlays` have been defined, processing starts at the first path of the `yamlFiles` array and processes one YAML file `path` at a time sequentially.  Within each YAML file `path`, `overlays` are processed first if set, followed by the items within the `documents` key, which applies overlays to specific documents within a multi-yaml document YAML file. A single YAML document in a YAML file could still be referred to by `path: 0` from the `documents` key if desired.
 
+#### Combining multiple instructions files
+
+When `-i` is passed more than once, each instructions file is applied as a complete layer, in the order given. For every YAML file, all of the first file's overlays (`commonOverlays`, then `yamlFiles[].overlays`, then `yamlFiles[].documents[].overlays`) are processed before any of the second file's overlays, and so on. A later instructions file therefore wins when it conflicts with an earlier one, even if the earlier file's overlay is more specific.
+
+```bash
+# labels.yaml is applied first, then registry.yaml, then app.yaml
+yot -i labels.yaml -i registry.yaml -i app.yaml -o ./output
+```
+
+* The `commonOverlays` of every instructions file apply to all YAML files, whether they were listed in that file, another instructions file, `-p`/`--path`, or stdin.
+* Relative `yamlFiles[].path` values are resolved against the directory of the instructions file they appear in.
+* When several instructions files list the same YAML file, it is read and written once, with all of their overlays applied in order. The last `outputPath` given for it is used.
+* An overlay from the CLI (`-q`, `-x`, `-a`) is processed as the last `commonOverlay` of the last instructions file.
+
 #### 3. Output
 
 Output is sent to the output directory specified at runtime, or if it was not provided, the default path of `./output/`, or to the location set within the `yot.config` or the `YOT_OUTPUT_DIRECTORY` environment variable.
@@ -41,7 +55,7 @@ Output is sent to the output directory specified at runtime, or if it was not pr
 
 ### Processing overlays with the CLI (no instructions file)
 
-When performing one-off overlays via the CLI, Yot treats the `-q` or `--query` parameter as part of a `commonOverlay`.  Based on the `-a` or `--action`, and `-x` or `--value` parameters a `commonOverlay` will be constructed within a in-memory instruction file, where `-p` or `--path` is loaded into the `yamlFiles` array.  
+When performing one-off overlays via the CLI, Yot treats the `-q` or `--query` parameter as part of a `commonOverlay`.  Based on the `-a` or `--action`, and `-x` or `--value` parameters a `commonOverlay` will be constructed within a in-memory instruction file, where `-p` or `--path` is loaded into the `yamlFiles` array.  A relative `-p` or `--path` is resolved against the current working directory. If `-p` is not given, YAML piped to stdin is used instead.  
 
 Templating is not allowed in a CLI-only or one-off overlay operation.  Processing occurs as described in [Processing overlays with a Yot instructions file](#processing-overlays-with-a-yot-instructions-file).
 

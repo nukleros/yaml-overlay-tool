@@ -15,6 +15,8 @@
   - [Manipulating the output indentation level](#manipulating-the-output-indentation-level)
   - [Remove source YAML file comments prior to overlayment](#remove-source-yaml-file-comments-prior-to-overlayment)
   - [Provide variable values to a templated Instructions file](#provide-variable-values-to-a-templated-instructions-file)
+  - [Combine multiple Instructions files](#combine-multiple-instructions-files)
+  - [Use a library of overlays without yamlFiles](#use-a-library-of-overlays-without-yamlfiles)
   - [Obtain logging or debug information](#obtain-logging-or-debug-information)
 - [Use without an Instructions file](#use-without-an-instructions-file)
   - [One-off overlay example](#one-off-overlay-example)
@@ -105,6 +107,30 @@ Pass variable values into Yot by using the `-f` paramater followed by the path t
 
 ```bash
 yot -i < instructions file > -f /my/template/values1.yaml -f /my/template/values2.yaml
+```
+
+When several instructions files are passed, the same values are used to render each of them.
+
+
+#### Combine multiple Instructions files
+
+Pass `-i` more than once to apply several instructions files in order.  When they conflict, the later file wins.  See [Order of operations](orderOfOperations.md#combining-multiple-instructions-files) for details.
+
+```bash
+yot -i examples/kubernetes/addLabels.yaml -i examples/kubernetes/privateContainerRegistry.yaml -s
+```
+
+
+#### Use a library of overlays without yamlFiles
+
+An instructions file may contain only `commonOverlays`, so that common overlays can be kept in a library and reused instead of being copied into each new instructions file.  Provide the YAML files to act upon with `-p` or by piping them to stdin.  A relative `-p` is resolved against the current working directory.
+
+```bash
+# YAML files from a path
+yot -i /path/to/library/labels.yaml -i /path/to/library/registry.yaml -p ./manifests -o /tmp/new
+
+# YAML piped to stdin
+cat ./manifests/*.yaml | yot -i /path/to/library/labels.yaml -s
 ```
 
 

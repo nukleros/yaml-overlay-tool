@@ -1,0 +1,8 @@
+---
+# An overlay library file that conflicts with labels.yaml.
+commonOverlays:
+  - name: set the team label from labelsOverride.yaml
+    query: metadata.labels
+    value:
+      team: override
+    action: merge

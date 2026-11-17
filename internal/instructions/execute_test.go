@@ -11,7 +11,7 @@ import (
 )
 
 // TestExecute does not call t.Parallel(): Execute() reads and writes the global
-// viper config (e.g. ReadInstructionFile sets "instructionsDir", encodeNodes reads
+// viper config (e.g. readInstructionFile sets "instructionsDir", encodeNodes reads
 // "indentLevel"/"outputStyle"/"stdout"), which races with any other test in this
 // package that also touches viper while running concurrently. See TestDocumentSeparators.
 func TestExecute(t *testing.T) { //nolint:paralleltest // must not run concurrently; see comment above
@@ -30,9 +30,9 @@ func TestExecute(t *testing.T) { //nolint:paralleltest // must not run concurren
 			name: "test simple execution",
 			args: args{
 				cfg: &instructions.Config{
-					InstructionsFile: "testdata/instructions.yaml",
-					OutputDir:        testOutputDir,
-					Indent:           2,
+					InstructionsFiles: []string{"testdata/instructions.yaml"},
+					OutputDir:         testOutputDir,
+					Indent:            2,
 				},
 			},
 			wantErr: false,
@@ -41,9 +41,9 @@ func TestExecute(t *testing.T) { //nolint:paralleltest // must not run concurren
 			name: "test directory execution",
 			args: args{
 				cfg: &instructions.Config{
-					InstructionsFile: "testdata/testInstructions.yaml",
-					OutputDir:        testOutputDir,
-					Indent:           2,
+					InstructionsFiles: []string{"testdata/testInstructions.yaml"},
+					OutputDir:         testOutputDir,
+					Indent:            2,
 				},
 			},
 			wantErr: false,
@@ -55,7 +55,7 @@ func TestExecute(t *testing.T) { //nolint:paralleltest // must not run concurren
 	viper.Set("outputDirectory", "./output")
 
 	// Subtests run sequentially, not in parallel: Execute() itself is not safe for
-	// concurrent invocation -- ReadInstructionFile writes the "instructionsDir" of
+	// concurrent invocation -- readInstructionFile writes the "instructionsDir" of
 	// the file it's currently processing to the same global viper config, which two
 	// concurrent Execute() calls would race on. Real CLI usage only ever calls
 	// Execute() once per process, so this mirrors how it's actually used.

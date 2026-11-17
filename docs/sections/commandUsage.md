@@ -33,7 +33,8 @@ Flags:
                                      Can be one of combine, delete, merge, or replace. Typically used for one-off overlays from the CLI.
   -h, --help                         help for yot
   -I, --indent-level int             Number of spaces to be used for indenting YAML output (min: 2, max: 9) (default 2)
-  -i, --instructions string          Path to the instructions file (required)
+  -i, --instructions stringArray     Path to an instructions file. Can be repeated to combine instructions files, which are
+                                     applied in the order given: later files win when they conflict with earlier ones.
   -v, --log-level logLevel[=debug]   Log-level to display to stdout, one of: 
                                         CRITICAL: {"critical", "crit", "c"},
                                         ERROR:    {"error", "err", "e"},
@@ -53,8 +54,9 @@ Flags:
                                         FOLDED:       {"folded", "fold", "fo"},
                                         FLOW:         {"flow", "fl"}
                                       (default [normal])
-  -p, --path string                  YAML files outside of the instructions file to process. Using a 'path' of "-" will read from stdin. 
-                                     Typically used for one-off overlays from the CLI.
+  -p, --path string                  YAML files or directories outside of the instructions file to process, relative to the
+                                     current working directory. Using a 'path' of "-" will read from stdin. When no
+                                     instructions file lists yamlFiles and --path is not given, YAML piped to stdin is read automatically.
   -q, --query overlays.Queries       JSONPath query or JSONPath fully-qualified (dot-notation) path you would like to manipulate.
                                      these will get added to the common overlays in conjunction with 'action' and 'value'
       --remove-comments              Remove all comments from the source YAML files prior to overlayment

@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"path"
 	"path/filepath"
 )
 
@@ -41,14 +40,14 @@ func GetCommonPrefix(separator byte, paths ...string) string {
 	case 0:
 		return ""
 	case 1:
-		return path.Dir(path.Clean(paths[0])) + string(os.PathSeparator)
+		return filepath.Dir(filepath.Clean(paths[0])) + string(os.PathSeparator)
 	}
 
 	// Start with the first path and shorten the prefix to whatever each other path shares.
-	prefix := path.Clean(paths[0]) + string(separator)
+	prefix := filepath.Clean(paths[0]) + string(separator)
 
 	for _, candidate := range paths[1:] {
-		candidate = path.Clean(candidate) + string(separator)
+		candidate = filepath.Clean(candidate) + string(separator)
 
 		if len(candidate) < len(prefix) {
 			prefix = prefix[:len(candidate)]

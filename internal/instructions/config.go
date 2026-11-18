@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"io/fs"
 	"os"
-	"path"
 	"path/filepath"
 
 	"github.com/nukleros/yaml-overlay-tool/internal/actions"
@@ -125,11 +124,11 @@ func (cfg *Config) openOutputFile(yamlFile *YamlFile, writtenPaths map[string]bo
 
 	// A relative outputPath is placed inside the output directory.
 	fileName := yamlFile.OutputPath
-	if !path.IsAbs(yamlFile.OutputPath) {
-		fileName = path.Join(viper.GetString("outputDirectory"), yamlFile.OutputPath)
+	if !filepath.IsAbs(yamlFile.OutputPath) {
+		fileName = filepath.Join(viper.GetString("outputDirectory"), yamlFile.OutputPath)
 	}
 
-	dirName := path.Dir(fileName)
+	dirName := filepath.Dir(fileName)
 
 	if _, err := os.Stat(dirName); os.IsNotExist(err) {
 		if err := os.MkdirAll(dirName, fs.FileMode(defaultDirMode)); err != nil {

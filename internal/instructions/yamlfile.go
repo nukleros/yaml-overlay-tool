@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"path"
+	"path/filepath"
 	"slices"
 
 	"github.com/nukleros/yaml-overlay-tool/internal/overlays"
@@ -148,8 +148,8 @@ func (yamlFiles *YamlFiles) expandDirectories() error {
 			continue
 		}
 
-		if !path.IsAbs(yamlFile.Path) {
-			yamlFile.Path = path.Join(viper.GetString(instructionsDirKey), yamlFile.Path)
+		if !filepath.IsAbs(yamlFile.Path) {
+			yamlFile.Path = filepath.Join(viper.GetString(instructionsDirKey), yamlFile.Path)
 		}
 
 		isDir, err := isDirectory(yamlFile.Path)
@@ -181,7 +181,7 @@ func (yamlFiles *YamlFiles) expandDirectories() error {
 // carrying its own copy of this entry's overlays, documents and outputPath.
 func (yamlFile *YamlFile) expandDirectory() (YamlFiles, error) {
 	// Every file in the directory keeps its own name, so the output must be a directory too.
-	if path.Ext(yamlFile.OutputPath) != "" {
+	if filepath.Ext(yamlFile.OutputPath) != "" {
 		return nil, fmt.Errorf("%w, provide a directory for outputPath instead", ErrFoundDirectoryWithPathOutput)
 	}
 

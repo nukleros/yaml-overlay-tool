@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"path"
 	"path/filepath"
 	"strings"
 
@@ -142,7 +141,7 @@ func (cfg *Config) readInstructionFile(instructionsFile string, values interface
 	// Relative yamlFiles paths are resolved against the directory of the instructions file
 	// they appear in. Decoding reads that directory from viper (see expandDirectories), so
 	// it must be set right before each file is decoded, and files are decoded one at a time.
-	viper.Set(instructionsDirKey, path.Dir(instructionsPath))
+	viper.Set(instructionsDirKey, filepath.Dir(instructionsPath))
 
 	var reader io.Reader
 
@@ -213,8 +212,8 @@ func (instructions *Instructions) setOutputPath() {
 	for _, yamlFile := range instructions.YamlFiles {
 		if yamlFile.OutputPath == "" {
 			yamlFile.OutputPath = strings.TrimPrefix(yamlFile.Path, pathPrefix)
-		} else if path.Ext(yamlFile.OutputPath) == "" {
-			yamlFile.OutputPath = path.Join(yamlFile.OutputPath, path.Base(yamlFile.Path))
+		} else if filepath.Ext(yamlFile.OutputPath) == "" {
+			yamlFile.OutputPath = filepath.Join(yamlFile.OutputPath, filepath.Base(yamlFile.Path))
 		}
 	}
 }

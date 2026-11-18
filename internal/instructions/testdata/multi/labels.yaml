@@ -1,0 +1,8 @@
+---
+# An overlay library file: commonOverlays only, no yamlFiles.
+commonOverlays:
+  - name: set the team label from labels.yaml
+    query: metadata.labels
+    value:
+      team: labels
+    action: merge

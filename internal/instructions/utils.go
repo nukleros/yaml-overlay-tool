@@ -8,12 +8,13 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"path"
 	"path/filepath"
 )
 
+// ReadStream opens fileName for reading, or returns a reader for stdin when fileName is
+// "-". The caller is responsible for closing the returned reader when it is an *os.File.
 func ReadStream(fileName string) (io.Reader, error) {
-	if fileName == "-" {
+	if fileName == stdInPath {
 		return bufio.NewReader(os.Stdin), nil
 	}
 
@@ -25,67 +26,79 @@ func ReadStream(fileName string) (io.Reader, error) {
 	return file, nil
 }
 
-// CloseFile safely closes a file handle.
+// CloseFile closes a file handle and logs any error instead of returning it.
 func CloseFile(file *os.File) {
 	if err := file.Close(); err != nil {
 		log.Errorf("error closing file!: %s", err)
 	}
 }
 
-// GetCommonPrefix determines the longest common prefix in a set of paths.
-func GetCommonPrefix(sep byte, paths ...string) string {
+// GetCommonPrefix returns the longest directory prefix shared by all paths, ending in a
+// path separator. For a single path, that is the directory containing it.
+func GetCommonPrefix(separator byte, paths ...string) string {
 	switch len(paths) {
 	case 0:
 		return ""
 	case 1:
-		return path.Dir(path.Clean(paths[0])) + string(os.PathSeparator)
-	}
+		directory := filepath.Dir(filepath.Clean(paths[0]))
 
-	c := path.Clean(paths[0]) + string(sep)
-
-	for _, v := range paths[1:] {
-		v = path.Clean(v) + string(sep)
-
-		if len(v) < len(c) {
-			c = c[:len(v)]
+		// Only a root directory (/ or C:\) already ends in a separator. Adding another gives
+		// //, which no path starts with, so nothing is trimmed and the file overwrites itself.
+		if os.IsPathSeparator(directory[len(directory)-1]) {
+			return directory
 		}
 
-		for i := 0; i < len(c); i++ {
-			if v[i] != c[i] {
-				c = c[:i]
+		return directory + string(os.PathSeparator)
+	}
+
+	// Start with the first path and shorten the prefix to whatever each other path shares.
+	prefix := filepath.Clean(paths[0]) + string(separator)
+
+	for _, candidate := range paths[1:] {
+		candidate = filepath.Clean(candidate) + string(separator)
+
+		if len(candidate) < len(prefix) {
+			prefix = prefix[:len(candidate)]
+		}
+
+		for index := range len(prefix) {
+			if candidate[index] != prefix[index] {
+				prefix = prefix[:index]
 
 				break
 			}
 		}
 	}
 
-	for i := len(c) - 1; i >= 0; i-- {
-		if c[i] == sep {
-			c = c[:i]
+	// The shared prefix may end partway through a name ("/a/foo" and "/a/fob" share "/a/fo"),
+	// so cut it back to the last separator.
+	for index := len(prefix) - 1; index >= 0; index-- {
+		if prefix[index] == separator {
+			prefix = prefix[:index]
 
 			break
 		}
 	}
 
-	return c + string(os.PathSeparator)
+	return prefix + string(os.PathSeparator)
 }
 
-// isDirectory determines if the given path is a directory.
-func isDirectory(p string) (bool, error) {
-	fileInfo, err := os.Stat(p)
+// isDirectory reports whether the given path is a directory.
+func isDirectory(filePath string) (bool, error) {
+	fileInfo, err := os.Stat(filePath)
 	if err != nil {
-		return false, fmt.Errorf("could not get file info for %s, %w", p, err)
+		return false, fmt.Errorf("could not get file info for %s, %w", filePath, err)
 	}
 
-	return fileInfo.IsDir(), err
+	return fileInfo.IsDir(), nil
 }
 
-// getFileNames recursively walks a path and outputs all filenames found.
-func getFileNames(p string) ([]string, error) {
+// getFileNames recursively walks a directory and returns every .yaml and .yml file in it.
+func getFileNames(directory string) ([]string, error) {
 	var results []string
 
-	err := filepath.Walk(p,
-		func(path string, info os.FileInfo, err error) error {
+	err := filepath.Walk(directory,
+		func(walkedPath string, info os.FileInfo, err error) error {
 			if err != nil {
 				return err
 			}
@@ -94,14 +107,14 @@ func getFileNames(p string) ([]string, error) {
 				return nil
 			}
 
-			if filepath.Ext(path) == ".yaml" || filepath.Ext(path) == ".yml" {
-				results = append(results, path)
+			if filepath.Ext(walkedPath) == ".yaml" || filepath.Ext(walkedPath) == ".yml" {
+				results = append(results, walkedPath)
 			}
 
 			return nil
 		})
 	if err != nil {
-		return nil, fmt.Errorf("could not walk directory %s, %w", p, err)
+		return nil, fmt.Errorf("could not walk directory %s, %w", directory, err)
 	}
 
 	return results, nil

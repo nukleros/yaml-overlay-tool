@@ -14,11 +14,12 @@ import (
 // value for the "log-level" flag and as its no-arg default.
 const logLevelDebug = "debug"
 
-func (r *Root) initializeCommonFlags() {
-	r.Command.Flags().StringVar(&r.configFile, "config", r.configFile, "config file (default is $HOME/.yot)")
+// initializeCommonFlags registers the --config and --log-level flags.
+func (root *Root) initializeCommonFlags() {
+	root.Command.Flags().StringVar(&root.configFile, "config", root.configFile, "config file (default is $HOME/.yot)")
 
-	if err := viper.BindPFlag("configFile", r.Command.Flags().Lookup("config")); err != nil {
-		r.Log.Fatal(err)
+	if err := viper.BindPFlag("configFile", root.Command.Flags().Lookup("config")); err != nil {
+		root.Log.Fatal(err)
 	}
 
 	logMap := map[logging.Level][]string{
@@ -30,94 +31,97 @@ func (r *Root) initializeCommonFlags() {
 		logging.DEBUG:    {logLevelDebug, "d", "verbose", "v"},
 	}
 
-	r.Command.Flags().VarP(
-		enumflag.New(&r.Options.LogLevel, "logLevel", logMap, enumflag.EnumCaseInsensitive),
+	root.Command.Flags().VarP(
+		enumflag.New(&root.Options.LogLevel, "logLevel", logMap, enumflag.EnumCaseInsensitive),
 		"log-level",
 		"v",
 		helpLogLevel,
 	)
 
-	r.Command.Flags().Lookup("log-level").NoOptDefVal = logLevelDebug
+	root.Command.Flags().Lookup("log-level").NoOptDefVal = logLevelDebug
 
-	if err := viper.BindPFlag("logLevel", r.Command.Flags().Lookup("log-level")); err != nil {
-		r.Log.Fatal(err)
+	if err := viper.BindPFlag("logLevel", root.Command.Flags().Lookup("log-level")); err != nil {
+		root.Log.Fatal(err)
 	}
 }
 
-func (r *Root) initializeOutputFlags() {
-	r.Command.Flags().StringVarP(
-		&r.Options.OutputDir,
+// initializeOutputFlags registers the --output-directory and --stdout flags.
+func (root *Root) initializeOutputFlags() {
+	root.Command.Flags().StringVarP(
+		&root.Options.OutputDir,
 		"output-directory",
 		"o",
 		"./output",
 		helpOutputDirectory,
 	)
 
-	if err := r.Command.MarkFlagDirname("output-directory"); err != nil {
-		r.Log.Fatal(err)
+	if err := root.Command.MarkFlagDirname("output-directory"); err != nil {
+		root.Log.Fatal(err)
 	}
 
-	r.Command.Flags().BoolVarP(
-		&r.Options.StdOut,
+	root.Command.Flags().BoolVarP(
+		&root.Options.StdOut,
 		"stdout",
 		"s",
 		false,
 		helpRenderStdOut,
 	)
 
-	if err := viper.BindPFlag("outputDirectory", r.Command.Flags().Lookup("output-directory")); err != nil {
-		r.Log.Fatal(err)
+	if err := viper.BindPFlag("outputDirectory", root.Command.Flags().Lookup("output-directory")); err != nil {
+		root.Log.Fatal(err)
 	}
 
-	if err := viper.BindPFlag("stdout", r.Command.Flags().Lookup("stdout")); err != nil {
-		r.Log.Fatal(err)
+	if err := viper.BindPFlag("stdout", root.Command.Flags().Lookup("stdout")); err != nil {
+		root.Log.Fatal(err)
 	}
 
 	viper.SetDefault("outputDirectory", "./output")
 }
 
-func (r *Root) initializeFormatFlags() {
+// initializeFormatFlags registers the flags that control how output YAML is formatted.
+func (root *Root) initializeFormatFlags() {
 	defaultIndentLevel := 2
 
-	r.Command.Flags().IntVarP(
-		&r.Options.Indent,
+	root.Command.Flags().IntVarP(
+		&root.Options.Indent,
 		"indent-level",
 		"I",
 		defaultIndentLevel,
 		helpIndentLevel,
 	)
 
-	r.Command.Flags().VarP(
-		enumflag.NewSlice(&r.Options.Styles, "style", actions.Styles{}.FlagMap(), enumflag.EnumCaseInsensitive),
+	root.Command.Flags().VarP(
+		enumflag.NewSlice(&root.Options.Styles, "style", actions.Styles{}.FlagMap(), enumflag.EnumCaseInsensitive),
 		"output-style",
 		"S",
 		helpOutputStyle,
 	)
 
-	r.Command.Flags().BoolVarP(
-		&r.Options.RemoveComments,
+	root.Command.Flags().BoolVarP(
+		&root.Options.RemoveComments,
 		"remove-comments",
 		"",
 		false,
 		helpRemoveComments,
 	)
 
-	if err := viper.BindPFlag("removeComments", r.Command.Flags().Lookup("remove-comments")); err != nil {
-		r.Log.Fatal(err)
+	if err := viper.BindPFlag("removeComments", root.Command.Flags().Lookup("remove-comments")); err != nil {
+		root.Log.Fatal(err)
 	}
 
-	if err := viper.BindPFlag("indentLevel", r.Command.Flags().Lookup("indent-level")); err != nil {
-		r.Log.Fatal(err)
+	if err := viper.BindPFlag("indentLevel", root.Command.Flags().Lookup("indent-level")); err != nil {
+		root.Log.Fatal(err)
 	}
 
-	if err := viper.BindPFlag("outputStyle", r.Command.Flags().Lookup("output-style")); err != nil {
-		r.Log.Fatal(err)
+	if err := viper.BindPFlag("outputStyle", root.Command.Flags().Lookup("output-style")); err != nil {
+		root.Log.Fatal(err)
 	}
 }
 
-func (r *Root) initializeTemplateFlags() {
-	r.Command.Flags().StringArrayVarP(
-		&r.Options.ValueFiles,
+// initializeTemplateFlags registers the repeatable --values-file flag.
+func (root *Root) initializeTemplateFlags() {
+	root.Command.Flags().StringArrayVarP(
+		&root.Options.ValueFiles,
 		"values-file",
 		"f",
 		nil,
@@ -125,54 +129,59 @@ func (r *Root) initializeTemplateFlags() {
 	)
 }
 
-func (r *Root) initializeInstructionFlags() {
-	r.Command.Flags().StringVarP(
-		&r.Options.InstructionsFile,
+// initializeInstructionFlags registers the repeatable --instructions flag and the
+// --default-on-missing-action flag.
+func (root *Root) initializeInstructionFlags() {
+	// A string array (not a string slice) so that commas in file names are not split.
+	root.Command.Flags().StringArrayVarP(
+		&root.Options.InstructionsFiles,
 		"instructions",
 		"i",
-		"",
+		nil,
 		helpInstructionsFile,
 	)
 
-	if err := r.Command.MarkFlagFilename("instructions"); err != nil {
-		r.Log.Error(err)
+	if err := root.Command.MarkFlagFilename("instructions"); err != nil {
+		root.Log.Error(err)
 	}
 
-	r.Command.Flags().Var(
-		&r.Options.DefaultOnMissingAction,
+	root.Command.Flags().Var(
+		&root.Options.DefaultOnMissingAction,
 		"default-on-missing-action",
 		helpDefaultOnMissingAction,
 	)
 
-	if err := viper.BindPFlag("defaultOnMissingAction", r.Command.Flags().Lookup("default-on-missing-action")); err != nil {
-		r.Log.Fatal(err)
+	if err := viper.BindPFlag("defaultOnMissingAction", root.Command.Flags().Lookup("default-on-missing-action")); err != nil {
+		root.Log.Fatal(err)
 	}
 }
 
-func (r *Root) initializeStdInFlags() {
-	r.Command.Flags().VarP(
-		&r.Options.Overlay.Query,
+// initializeStdInFlags registers the flags for one-off overlays from the command line:
+// --query, --action, --value and --path.
+func (root *Root) initializeStdInFlags() {
+	root.Command.Flags().VarP(
+		&root.Options.Overlay.Query,
 		"query",
 		"q",
 		helpQuery,
 	)
 
-	r.Command.Flags().VarP(
-		&r.Options.Overlay.Action,
+	root.Command.Flags().VarP(
+		&root.Options.Overlay.Action,
 		"action",
 		"a",
 		helpAction,
 	)
 
-	r.Command.Flags().StringVarP(
-		&r.Options.Value,
+	root.Command.Flags().StringVarP(
+		&root.Options.Value,
 		"value",
 		"x",
 		"",
 		helpValue,
 	)
-	r.Command.Flags().StringVarP(
-		&r.Options.Path,
+	root.Command.Flags().StringVarP(
+		&root.Options.Path,
 		"path",
 		"p",
 		"",

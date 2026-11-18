@@ -6,8 +6,8 @@ package commands
 var version = "unstable"
 
 const (
-	YotUse = `yot -i File [-o Dir | -s] [-p Path] [-f File]... [-v=[critical|error|warning|notice|info|debug]] [flags]
-  yot -q Query -x Value [-a Action] [-i File [-f File]...] [-o Dir | -s] [-p Path]  [-v=[critical|error|warning|notice|info|debug]] `
+	YotUse = `yot -i File [-i File]... [-o Dir | -s] [-p Path] [-f File]... [-v=[critical|error|warning|notice|info|debug]] [flags]
+  yot -q Query -x Value [-a Action] [-i File]... [-f File]... [-o Dir | -s] [-p Path] [-v=[critical|error|warning|notice|info|debug]] `
 	YotShort = "Yot (YAML Overlay Tool) is a YAML overlay tool."
 
 	YotLong = `Yot (YAML Overlay Tool) is a YAML overlay tool which uses a templatable YAML schema to define overlay 
@@ -31,7 +31,11 @@ from the previous. Values are applied to your instructions file when using templ
 	DEBUG:    {"debug", "d", "verbose", "v"} * used if no argument is provided
 `
 
-	helpInstructionsFile = "Path to the instructions file"
+	helpInstructionsFile = `Path to an instructions file. Can be repeated to combine instructions files, which are
+applied in the order given: later files win when they conflict with earlier ones. Each file's
+commonOverlays apply to every YAML file, including those from other instructions files and --path.
+yamlFiles may be omitted when the YAML files come from another instructions file, --path or stdin.
+`
 
 	helpOutputDirectory = `(YOT_OUTPUT_DIRECTORY) Path to a directory for writing the YAML files which were operated on by Yot`
 	/*	`If value files were supplied in addition to a
@@ -62,8 +66,9 @@ Can be one of combine, delete, merge, or replace. Typically used for one-off ove
 Typically used for one-off overlays from the CLI.
 `
 
-	helpPath = `YAML files or directories outside of the instructions file to process. 
-Using a 'path' of "-" will read from stdin. Typically used for one-off overlays from the CLI.
+	helpPath = `YAML files or directories outside of the instructions file to process, relative to the
+current working directory. Using a 'path' of "-" will read from stdin. When no instructions file
+lists yamlFiles and --path is not given, YAML piped to stdin is read automatically.
 `
 
 	helpRemoveComments = `(YOT_REMOVE_COMMENTS) Remove all comments from the source YAML files prior to overlayment

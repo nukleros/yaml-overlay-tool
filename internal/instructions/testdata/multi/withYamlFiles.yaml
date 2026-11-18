@@ -1,0 +1,11 @@
+---
+# Lists a YAML file with an overlay specific to it.
+yamlFiles:
+  - name: app manifest
+    path: manifests/app.yaml
+    overlays:
+      - name: set the team label for this file only
+        query: metadata.labels
+        value:
+          team: specific
+        action: merge

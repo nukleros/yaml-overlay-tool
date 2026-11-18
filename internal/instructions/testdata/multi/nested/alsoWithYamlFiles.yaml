@@ -1,0 +1,12 @@
+---
+# Names the same YAML file as ../withYamlFiles.yaml, using a path relative to this
+# file's own directory.
+yamlFiles:
+  - name: app manifest from a nested instructions file
+    path: ../manifests/app.yaml
+    overlays:
+      - name: set the team label from the nested instructions file
+        query: metadata.labels
+        value:
+          team: nested
+        action: merge

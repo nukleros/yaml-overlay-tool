@@ -31,6 +31,8 @@ The `commonOverlays` key is optional. It provides overlays to apply to every ite
 
 ## Top-Level yamlFiles keys
 
+The `yamlFiles` key is optional. When no instructions file lists any `yamlFiles`, the YAML files to process must come from `-p`/`--path` or from YAML piped to stdin.
+
 Each list item in the `yamlFiles` key is treated as a dictionary/map with the following top-level keys:
 
 | key | required | description | default | type |

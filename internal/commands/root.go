@@ -18,6 +18,7 @@ import (
 // ErrMissingRequired occurs when a required flag is not passed.
 var ErrMissingRequired = fmt.Errorf("missing required arguments")
 
+// Root is the yot root command along with the options its flags populate.
 type Root struct {
 	configFile string
 	Log        *logging.Logger
@@ -25,8 +26,12 @@ type Root struct {
 	Command    *cobra.Command
 }
 
+// New builds the yot root command with its flags and subcommands. Because it adds an
+// initializer with cobra.OnInitialize and binds flags to the global viper instance, call
+// it once per process, and never from parallel tests, where concurrent calls race on
+// viper's internal maps.
 func New() *Root {
-	rc := &Root{
+	root := &Root{
 		Log: logging.MustGetLogger("cmd"),
 		Options: &instructions.Config{
 			LogLevel:               logging.WARNING,
@@ -36,28 +41,29 @@ func New() *Root {
 		configFile: os.Getenv("YOT_CONFIG_FILE"),
 	}
 
-	cobra.OnInitialize(rc.initConfig)
+	cobra.OnInitialize(root.initConfig)
 
-	rc.Command = rc.NewCommand()
-	rc.AddFlags()
-	rc.AddCommands()
+	root.Command = root.NewCommand()
+	root.AddFlags()
+	root.AddCommands()
 
-	return rc
+	return root
 }
 
-func (r *Root) initConfig() {
-	for k, v := range envMap() {
-		if err := viper.BindEnv(k, v); err != nil {
-			r.Log.Fatal(err)
+// initConfig binds environment variables and reads the yot config file, if one exists.
+func (root *Root) initConfig() {
+	for envVar, settingKey := range envMap() {
+		if err := viper.BindEnv(envVar, settingKey); err != nil {
+			root.Log.Fatal(err)
 		}
 	}
 
 	viper.SetConfigType("yaml")
 	viper.SetConfigName("yot.config")
 
-	if r.configFile != "" {
+	if root.configFile != "" {
 		// Use config file from the flag.
-		viper.SetConfigFile(r.configFile)
+		viper.SetConfigFile(root.configFile)
 	} else {
 		viper.AddConfigPath("./")
 		viper.AddConfigPath("$HOME/.yot/") // call multiple times to add many search paths
@@ -66,7 +72,7 @@ func (r *Root) initConfig() {
 
 	if err := viper.ReadInConfig(); err != nil {
 		if ok := errors.As(err, &viper.ConfigFileNotFoundError{}); !ok {
-			r.Log.Fatal(err)
+			root.Log.Fatal(err)
 		}
 
 		return
@@ -75,8 +81,8 @@ func (r *Root) initConfig() {
 	viper.Set("configFile", viper.ConfigFileUsed())
 }
 
-func (r Root) NewCommand() *cobra.Command {
-	// rootCmd represents the base command when called without any subcommands.
+// NewCommand returns the cobra command for yot, which runs when no subcommand is given.
+func (root Root) NewCommand() *cobra.Command {
 	rootCmd := &cobra.Command{
 		Use:                        YotUse,
 		Aliases:                    []string{},
@@ -92,11 +98,11 @@ func (r Root) NewCommand() *cobra.Command {
 		Hidden:                     false,
 		Annotations:                map[string]string{},
 		Version:                    version,
-		PersistentPreRun:           r.SetupLogging,
+		PersistentPreRun:           root.SetupLogging,
 		PersistentPreRunE:          nil,
 		PreRun:                     nil,
 		PreRunE:                    nil,
-		RunE:                       r.Execute,
+		RunE:                       root.Execute,
 		PostRun:                    nil,
 		PostRunE:                   nil,
 		PersistentPostRun:          nil,
@@ -115,21 +121,24 @@ func (r Root) NewCommand() *cobra.Command {
 	return rootCmd
 }
 
-func (r *Root) AddFlags() {
-	r.initializeCommonFlags()
-	r.initializeInstructionFlags()
-	r.initializeOutputFlags()
-	r.initializeFormatFlags()
-	r.initializeTemplateFlags()
-	r.initializeStdInFlags()
+// AddFlags registers every flag of the root command.
+func (root *Root) AddFlags() {
+	root.initializeCommonFlags()
+	root.initializeInstructionFlags()
+	root.initializeOutputFlags()
+	root.initializeFormatFlags()
+	root.initializeTemplateFlags()
+	root.initializeStdInFlags()
 }
 
-func (r *Root) AddCommands() {
-	r.Command.AddCommand(r.CompletionCommand())
-	r.Command.AddCommand(r.EnvCommand())
+// AddCommands registers the subcommands of the root command.
+func (root *Root) AddCommands() {
+	root.Command.AddCommand(root.CompletionCommand())
+	root.Command.AddCommand(root.EnvCommand())
 }
 
-func (r *Root) SetupLogging(cmd *cobra.Command, args []string) {
+// SetupLogging configures the log format and level before any command runs.
+func (root *Root) SetupLogging(cmd *cobra.Command, args []string) {
 	cmd.SetOut(cmd.OutOrStdout())
 
 	format := logging.MustStringFormatter(
@@ -149,12 +158,15 @@ func (r *Root) SetupLogging(cmd *cobra.Command, args []string) {
 	logging.SetBackend(backend)
 
 	if viper.ConfigFileUsed() != "" {
-		r.Log.Debugf("Using config file: %s", viper.ConfigFileUsed())
+		root.Log.Debugf("Using config file: %s", viper.ConfigFileUsed())
 	}
 }
 
-func (r *Root) Execute(cmd *cobra.Command, args []string) error {
-	if err := instructions.Execute(r.Options); err != nil {
+// Execute runs yot: it loads the instructions, applies the overlays and writes the output.
+func (root *Root) Execute(cmd *cobra.Command, args []string) error {
+	root.Options.StdInPiped = isStdInPiped()
+
+	if err := instructions.Execute(root.Options); err != nil {
 		cmd.SilenceUsage = true
 
 		return fmt.Errorf("%w", err)
@@ -163,9 +175,21 @@ func (r *Root) Execute(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func (r *Root) Run() {
-	if err := r.Command.Execute(); err != nil {
-		r.Log.Error(err)
+// Run executes the root command and exits with a non-zero status on error.
+func (root *Root) Run() {
+	if err := root.Command.Execute(); err != nil {
+		root.Log.Error(err)
 		os.Exit(1)
 	}
+}
+
+// isStdInPiped reports whether stdin is a pipe or a redirected file. A terminal or a
+// character device such as /dev/null is not, so yot will not wait on it for input.
+func isStdInPiped() bool {
+	stdInInfo, err := os.Stdin.Stat()
+	if err != nil {
+		return false
+	}
+
+	return stdInInfo.Mode()&os.ModeCharDevice == 0
 }

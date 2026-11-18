@@ -17,7 +17,8 @@ const (
 	ShellPowerShell = "powershell"
 )
 
-func (r *Root) CompletionCommand() *cobra.Command {
+// CompletionCommand returns the subcommand that generates shell auto-completion scripts.
+func (root *Root) CompletionCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:                   completionUse,
 		Short:                 completionShort,
@@ -25,11 +26,12 @@ func (r *Root) CompletionCommand() *cobra.Command {
 		DisableFlagsInUseLine: true,
 		ValidArgs:             []string{ShellBash, ShellZsh, ShellFish, ShellPowerShell},
 		Args:                  cobra.MatchAll(cobra.ExactArgs(1), cobra.OnlyValidArgs),
-		Run:                   r.Completions,
+		Run:                   root.Completions,
 	}
 }
 
-func (r *Root) Completions(cmd *cobra.Command, args []string) {
+// Completions writes the auto-completion script for the requested shell to stdout.
+func (root *Root) Completions(cmd *cobra.Command, args []string) {
 	if len(args) > 1 {
 		panic("Too Many Args")
 	}
@@ -37,19 +39,19 @@ func (r *Root) Completions(cmd *cobra.Command, args []string) {
 	switch args[0] {
 	case ShellBash:
 		if err := cmd.Root().GenBashCompletion(os.Stdout); err != nil {
-			r.Log.Fatal(err)
+			root.Log.Fatal(err)
 		}
 	case ShellZsh:
 		if err := cmd.Root().GenZshCompletion(os.Stdout); err != nil {
-			r.Log.Fatal(err)
+			root.Log.Fatal(err)
 		}
 	case ShellFish:
 		if err := cmd.Root().GenFishCompletion(os.Stdout, true); err != nil {
-			r.Log.Fatal(err)
+			root.Log.Fatal(err)
 		}
 	case ShellPowerShell:
 		if err := cmd.Root().GenPowerShellCompletionWithDesc(os.Stdout); err != nil {
-			r.Log.Fatal(err)
+			root.Log.Fatal(err)
 		}
 	}
 }

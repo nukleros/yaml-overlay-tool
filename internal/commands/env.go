@@ -11,7 +11,8 @@ import (
 	"github.com/spf13/viper"
 )
 
-func (r *Root) EnvCommand() *cobra.Command {
+// EnvCommand returns the subcommand that prints the settings yot is using.
+func (root *Root) EnvCommand() *cobra.Command {
 	return &cobra.Command{
 		Use:                   "env [settingName]",
 		Short:                 envShort,
@@ -20,35 +21,35 @@ func (r *Root) EnvCommand() *cobra.Command {
 		Args:                  cobra.MaximumNArgs(1),
 		ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 			if len(args) == 0 {
-				kmap := envMap()
-				keys := make([]string, len(kmap))
+				settings := envMap()
+				envVars := make([]string, 0, len(settings))
 
-				i := 0
-				for k := range kmap {
-					keys[i] = k
-					i++
+				for envVar := range settings {
+					envVars = append(envVars, envVar)
 				}
 
-				return keys, cobra.ShellCompDirectiveNoFileComp
+				return envVars, cobra.ShellCompDirectiveNoFileComp
 			}
 
 			return nil, cobra.ShellCompDirectiveNoFileComp
 		},
-		Run: r.env,
+		Run: root.env,
 	}
 }
 
-func (r *Root) env(cmd *cobra.Command, args []string) {
+// env prints every setting, or only the one named in args, as ENV_VAR="value".
+func (root *Root) env(cmd *cobra.Command, args []string) {
 	settings := envMap()
 	if len(args) == 0 {
-		for k, v := range settings {
-			fmt.Fprintf(os.Stdout, "%s=\"%v\"\n", k, viper.Get(v))
+		for envVar, settingKey := range settings {
+			fmt.Fprintf(os.Stdout, "%s=\"%v\"\n", envVar, viper.Get(settingKey))
 		}
 	} else {
 		fmt.Fprintf(os.Stdout, "%s=\"%v\"\n", args[0], viper.Get(settings[args[0]]))
 	}
 }
 
+// envMap maps each environment variable yot reads to the setting it controls.
 func envMap() map[string]string {
 	return map[string]string{
 		"YOT_CONFIG_FILE":               "configFile",

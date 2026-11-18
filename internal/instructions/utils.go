@@ -40,7 +40,15 @@ func GetCommonPrefix(separator byte, paths ...string) string {
 	case 0:
 		return ""
 	case 1:
-		return filepath.Dir(filepath.Clean(paths[0])) + string(os.PathSeparator)
+		directory := filepath.Dir(filepath.Clean(paths[0]))
+
+		// Only a root directory (/ or C:\) already ends in a separator. Adding another gives
+		// //, which no path starts with, so nothing is trimmed and the file overwrites itself.
+		if os.IsPathSeparator(directory[len(directory)-1]) {
+			return directory
+		}
+
+		return directory + string(os.PathSeparator)
 	}
 
 	// Start with the first path and shorten the prefix to whatever each other path shares.

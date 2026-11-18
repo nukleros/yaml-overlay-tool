@@ -42,6 +42,13 @@ var (
 	ErrStdInOnlyForPath = errors.New(
 		`stdin ("-") is only supported for -p/--path, not for -i/--instructions or -f/--values-file`,
 	)
+
+	// ErrNoSharedInputDirectory occurs on Windows when YAML files without an outputPath are
+	// on different drives. They share no directory, so their output paths would keep the
+	// drive and overwrite the source files instead of landing in the output directory.
+	ErrNoSharedInputDirectory = errors.New(
+		"YAML files on different drives share no directory to keep their paths relative to; set outputPath for them or use -s/--stdout",
+	)
 )
 
 // Config contains the options, gathered from flags, environment variables and the config

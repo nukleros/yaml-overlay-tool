@@ -70,7 +70,9 @@ func (cfg *Config) GetInstructions() (*Instructions, error) {
 		return nil, err
 	}
 
-	merged.setOutputPath()
+	if err := merged.setOutputPath(); err != nil {
+		return nil, err
+	}
 
 	if viper.GetBool("removeComments") {
 		merged.YamlFiles.removeComments()
@@ -187,7 +189,7 @@ func countYamlFiles(instructionSets []*Instructions) int {
 // keeps its path relative to the longest directory shared by all input files. An
 // outputPath without a file extension is a directory, and the input file name is kept
 // inside it.
-func (instructions *Instructions) setOutputPath() {
+func (instructions *Instructions) setOutputPath() error {
 	inputPaths := make([]string, 0, len(instructions.YamlFiles))
 
 	for _, yamlFile := range instructions.YamlFiles {
@@ -201,8 +203,17 @@ func (instructions *Instructions) setOutputPath() {
 	for _, yamlFile := range instructions.YamlFiles {
 		if yamlFile.OutputPath == "" {
 			yamlFile.OutputPath = strings.TrimPrefix(yamlFile.Path, pathPrefix)
+
+			// Files on different Windows drives share no directory, so the derived path keeps
+			// its drive and would overwrite the source. VolumeName is always empty on Linux
+			// and macOS, so this never fires there.
+			if filepath.VolumeName(yamlFile.OutputPath) != "" && !viper.GetBool("stdout") {
+				return fmt.Errorf("cannot derive an output path for %s, %w", yamlFile.Path, ErrNoSharedInputDirectory)
+			}
 		} else if filepath.Ext(yamlFile.OutputPath) == "" {
 			yamlFile.OutputPath = filepath.Join(yamlFile.OutputPath, filepath.Base(yamlFile.Path))
 		}
 	}
+
+	return nil
 }

@@ -131,7 +131,7 @@ func TestPipedStdIn(t *testing.T) { //nolint:paralleltest // replaces os.Stdin a
 }
 
 // TestInputErrors checks the errors returned when there is nothing to process, or when
-// stdin is requested more than once.
+// stdin is given for an instructions or values file.
 func TestInputErrors(t *testing.T) { //nolint:paralleltest // shares global viper state
 	tests := []struct {
 		name    string
@@ -152,12 +152,22 @@ func TestInputErrors(t *testing.T) { //nolint:paralleltest // shares global vipe
 			wantErr: instructions.ErrNoYamlFiles,
 		},
 		{
-			name: "stdin used for both instructions and --path",
+			name: "instructions file from stdin",
 			cfg: &instructions.Config{
 				InstructionsFiles: []string{"-"},
-				Path:              "-",
 			},
-			wantErr: instructions.ErrStdInUsedMoreThanOnce,
+			wantErr: instructions.ErrStdInOnlyForPath,
+		},
+		{
+			// Before stdin was limited to --path, the values file read stdin first and the
+			// stdin fallback then picked the empty stream as the YAML to process.
+			name: "values file from stdin with an overlay-only instructions file",
+			cfg: &instructions.Config{
+				InstructionsFiles: []string{labelsFile},
+				ValueFiles:        []string{"-"},
+				StdInPiped:        true,
+			},
+			wantErr: instructions.ErrStdInOnlyForPath,
 		},
 	}
 

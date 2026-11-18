@@ -8,6 +8,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 
 	"github.com/nukleros/yaml-overlay-tool/internal/overlays"
@@ -78,23 +79,11 @@ func (cfg *Config) GetInstructions() (*Instructions, error) {
 	return merged, nil
 }
 
-// validateStdInUsage makes sure stdin ("-") is requested at most once across the
-// --instructions and --path flags, because stdin is empty once it has been read.
+// validateStdInUsage makes sure stdin ("-") is not given for an instructions or values
+// file. Stdin only provides the YAML files to process.
 func (cfg *Config) validateStdInUsage() error {
-	stdInUses := 0
-
-	for _, instructionsFile := range cfg.InstructionsFiles {
-		if instructionsFile == stdInPath {
-			stdInUses++
-		}
-	}
-
-	if cfg.Path == stdInPath {
-		stdInUses++
-	}
-
-	if stdInUses > 1 {
-		return ErrStdInUsedMoreThanOnce
+	if slices.Contains(cfg.InstructionsFiles, stdInPath) || slices.Contains(cfg.ValueFiles, stdInPath) {
+		return ErrStdInOnlyForPath
 	}
 
 	return nil

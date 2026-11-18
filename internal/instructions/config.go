@@ -37,9 +37,11 @@ var (
 		"no YAML files to process: add yamlFiles to an instructions file, pass -p/--path, or pipe YAML on stdin",
 	)
 
-	// ErrStdInUsedMoreThanOnce occurs when "-" (stdin) is given more than once across the
-	// --instructions and --path flags. Stdin can only be read once.
-	ErrStdInUsedMoreThanOnce = errors.New(`stdin ("-") can only be used once across --instructions and --path`)
+	// ErrStdInOnlyForPath occurs when "-" (stdin) is given for an instructions or values
+	// file. Stdin only provides the YAML files to process, with --path or piped on its own.
+	ErrStdInOnlyForPath = errors.New(
+		`stdin ("-") is only supported for -p/--path, not for -i/--instructions or -f/--values-file`,
+	)
 )
 
 // Config contains the options, gathered from flags, environment variables and the config
@@ -212,29 +214,14 @@ func (cfg *Config) adHocYamlFiles(instructionSets []*Instructions) (YamlFiles, e
 		return yamlFilesFromPath(cfg.Path)
 	}
 
-	readStdIn := cfg.StdInPiped &&
-		!cfg.instructionsReadFromStdIn() &&
-		countYamlFiles(instructionSets) == 0
-
-	if readStdIn {
+	// Nothing else reads stdin (see validateStdInUsage), so it is still unread here.
+	if cfg.StdInPiped && countYamlFiles(instructionSets) == 0 {
 		log.Debugf("No YAML files were given, reading YAML from stdin")
 
 		return yamlFilesFromPath(stdInPath)
 	}
 
 	return nil, nil
-}
-
-// instructionsReadFromStdIn reports whether one of the instructions files is stdin, in
-// which case stdin has already been consumed.
-func (cfg *Config) instructionsReadFromStdIn() bool {
-	for _, instructionsFile := range cfg.InstructionsFiles {
-		if instructionsFile == stdInPath {
-			return true
-		}
-	}
-
-	return false
 }
 
 // yamlFilesFromPath builds YAML file entries for a path given on the command line.

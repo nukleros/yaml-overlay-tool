@@ -52,19 +52,19 @@ snap install yaml-overlay-tool
 >**NOTE**: `yot` installs with [_strict confinement_](https://docs.snapcraft.io/snap-confinement/6233) in snap, this means it doesn't have direct access to root files. To read root files you can:
 
 ```bash
-sudo cat /etc/myfile.yaml | yot -i -
+sudo cat /etc/myfile.yaml | yot -i instructions.yaml -p -
 ```
 
 And to write to a root file you can either use [sponge](https://linux.die.net/man/1/sponge):
 
 ```bash
-sudo cat /etc/myfile.yaml | yot -s -i - | sudo sponge /etc/myfile.yaml
+sudo cat /etc/myfile.yaml | yot -s -i instructions.yaml -p - | sudo sponge /etc/myfile.yaml
 ```
 
 or write to a temporary file:
 
 ```bash
-sudo cat /etc/myfile.yaml | yot -s -i  | sudo tee /etc/myfiletmp.yaml
+sudo cat /etc/myfile.yaml | yot -s -i instructions.yaml -p - | sudo tee /etc/myfiletmp.yaml
 sudo mv /etc/myfiletmp.yaml /etc/myfile.yaml
 ```
 
